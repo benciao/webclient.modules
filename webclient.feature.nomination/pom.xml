@@ -15,6 +15,10 @@
 			<artifactId>webclient.api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>benciao.webclient</groupId>
+			<artifactId>webclient.resources</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>

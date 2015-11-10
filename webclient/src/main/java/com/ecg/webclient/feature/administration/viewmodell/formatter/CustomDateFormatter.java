@@ -13,34 +13,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomDateFormatter implements Formatter<Date>
 {
-    @Autowired
-    private MessageSource messageSource;
+	@Autowired
+	private MessageSource messageSource;
 
-    public CustomDateFormatter()
-    {
-        super();
-    }
+	public CustomDateFormatter()
+	{
+		super();
+	}
 
-    @Override
-    public Date parse(final String text, final Locale locale) throws ParseException
-    {
-        final SimpleDateFormat dateFormat = createDateFormat(locale);
-        return dateFormat.parse(text);
-    }
+	@Override
+	public Date parse(final String text, final Locale locale) throws ParseException
+	{
+		final SimpleDateFormat dateFormat = createDateFormat(locale);
+		return dateFormat.parse(text);
+	}
 
-    @Override
-    public String print(final Date object, final Locale locale)
-    {
-        final SimpleDateFormat dateFormat = createDateFormat(locale);
-        return dateFormat.format(object);
-    }
+	@Override
+	public String print(final Date object, final Locale locale)
+	{
+		final SimpleDateFormat dateFormat = createDateFormat(locale);
+		return dateFormat.format(object);
+	}
 
-    private SimpleDateFormat createDateFormat(final Locale locale)
-    {
-        final String format = this.messageSource.getMessage("date.format", null, locale);
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-        dateFormat.setLenient(false);
-        return dateFormat;
-    }
-
+	private SimpleDateFormat createDateFormat(final Locale locale)
+	{
+		final String format = this.messageSource.getMessage("date.format", null, locale);
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+		dateFormat.setLenient(false);
+		return dateFormat;
+	}
 }

@@ -15,6 +15,10 @@
 		</dependency>
 		<dependency>
 			<groupId>benciao.webclient</groupId>
+			<artifactId>webclient.resources</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>benciao.webclient</groupId>
 			<artifactId>webclient.feature.nomination</artifactId>
 		</dependency>
 		<dependency>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+	<body>
+		<div th:fragment="navigation(selectedItem,collapseIn)">
+
+			<div id="submenu" class="container navigation-submenu">
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+									<span class="glyphicon glyphicon-dashboard">
+									</span>
+									<span th:text="#{nom.menuTreeMonitor}"></span>
+								</a>
+							</h4>
+						</div>
+						<div th:if="${collapseIn == 'monitor'}" id="collapseOne"
+							class="panel-collapse collapse in">
+							<div class="panel-body">
+								<table class="table">
+									<!-- ToDo-Monitor-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'todo'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeTodoMonitor}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'client'}">
+											<td>
+												<a href="">
+													<span th:text="#{nom.menuTreeToDoMonitor}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+									<!-- ToDo-Monitor erweitert -Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'todo-ext'}" class="warning">
+											<td>
+												<a href="">
+													<span th:text="#{nom.menuTreeToDoMonitorExtended}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'todo-ext'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeToDoMonitorExtended}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+						<div th:if="${collapseIn != 'monitor'}" id="collapseOne"
+							class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table">
+									<!-- ToDo-Monitor-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'todo'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeTodoMonitor}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'client'}">
+											<td>
+												<a href="">
+													<span th:text="#{nom.menuTreeToDoMonitor}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+									<!-- ToDo-Monitor erweitert -Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'todo-ext'}" class="warning">
+											<td>
+												<a href="">
+													<span th:text="#{nom.menuTreeToDoMonitorExtended}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'todo-ext'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeToDoMonitorExtended}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+									<span class="glyphicon glyphicon-th-list">
+									</span>
+									<span th:text="#{nom.menuTreeNomMasterData}"></span>
+								</a>
+							</h4>
+						</div>
+						<div th:if="${collapseIn == 'md'}" id="collapseTwo"
+							class="panel-collapse collapse in">
+							<div class="panel-body">
+								<table class="table">
+									<!-- Speicher-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'storage'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeStorage}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'storage'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeStorage}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+									<!-- Vertrags-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'contract'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeContract}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'contract'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeContract}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+
+						<div th:if="${collapseIn != 'md'}" id="collapseTwo"
+							class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table">
+									<!-- Speicher-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'storage'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeStorage}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'storage'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeStorage}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+									<!-- Vertrags-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'contract'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeContract}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'contract'}">
+											<td>
+												<a href="#">
+													<span th:text="#{nom.menuTreeContract}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+
+			<div id="separator">
+				<div class="separator-content">
+					<a href="javascript:toggle_sub_menu_visibility();">
+						<img th:src="@{'/icons/separator_clickable.png'}"></img>
+					</a>
+				</div>
+				<div id="separator-line"></div>
+			</div>
+		</div>
+	</body>
+</html>
