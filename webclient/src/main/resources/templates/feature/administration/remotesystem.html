@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>MTS Web Client- Mandantenkonfiguration</title>
+
+		<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+		<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+			media="screen" />
+		<link th:href="@{/css/webclient.css}" rel="stylesheet" />
+		<link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
+		<link th:href="@{/css/bootstrap-switch.css}" rel="stylesheet" />
+		<link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
+		<link th:href="@{/css/bootstrap-multiselect.css}" rel="stylesheet" />
+
+		<script th:src="@{/js/jquery.js}"></script>
+		<script th:src="@{/js/bootstrap.js}"></script>
+		<script th:src="@{/js/bootstrap-select.js}"></script>
+		<script th:src="@{/js/bootstrap-multiselect.js}"></script>
+
+		<script th:src="@{/js/bootstrap-switch.js}"></script>
+		<script th:src="@{/js/bootstrap-colorpicker.js}"></script>
+		<script th:src="@{/js/webclient.js}"></script>
+
+		<script type="text/javascript" th:inline="text">
+			/*<![CDATA[*/
+	$(document)
+			.ready(
+					function() {
+						$('#remoteSystemsAddRow')
+								.click(
+										function() {
+											var rowIndex = $(
+													'#remoteSystemTable tbody')
+													.children().length;
+											$('#remoteSystemTable tbody')
+													.append(
+															"<tr>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{remoteSystemsTableName}]]' id='name-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].name' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{remoteSystemsTableDescription}]]' id='description-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].description' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='remoteSystem-state-switch' data-size='mini' data-checked='true' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='remoteSystems[" + rowIndex + "].enabled' value='true' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<a href='#' class='a_delete' title='[[#{remoteSystemsActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{remoteSystemsActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='remoteSystems[" + rowIndex + "].delete' value='false' />"
+																	+ "<input type='hidden' id='hiddenLoginUrl-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].loginUrl' />"
+																	+ "<input type='hidden' id='hiddenLoginParameter-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].loginParameter' />"
+																	+ "<input type='hidden' id='hiddenPasswordParameter-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].passwordParameter' />"
+																	+ "<input type='hidden' id='hiddenLogoutUrl-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].logoutUrl' />"
+																	+ "<input type='hidden' id='hiddenUserRids-"+ rowIndex +"' name='remoteSystems["+ rowIndex +"].assignedUserIds' />"
+																	+ "</td>"
+																	+ "</tr>");
+
+											$('#a_delete-' + rowIndex).click(
+													function(event) {
+														onDeleteClick(event);
+													});
+
+											$('#switch-' + rowIndex)
+													.bootstrapSwitch()
+													.on(
+															'switchChange.bootstrapSwitch',
+															function(event,
+																	state) {
+																var collectionIndex = event.target.id
+																		.split("-");
+																$(
+																		"#hiddenSwitch-"
+																				+ collectionIndex[1])
+																		.val(
+																				state);
+																$(
+																		"#remoteSystemsSave")
+																		.removeClass(
+																				"disabled");
+															});
+
+											$("#remoteSystemsSave")
+													.removeClass("disabled");
+
+											$("#hiddenSwitch-" + rowIndex).val(
+													false);
+
+											$('.a_edit').click(function(event) {
+												editOnClick(event);
+											});
+
+										});
+
+						$("#remoteSystemEditPanel").modal('hide');
+
+						$("[name='remoteSystem-state-switch']")
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var collectionIndex = event.target.id
+													.split("-");
+											$(
+													"#hiddenSwitch-"
+															+ collectionIndex[1])
+													.val(state);
+											$("#remoteSystemsSave")
+													.removeClass("disabled");
+										});
+
+						$('.form-control').change(function() {
+							$("#remoteSystemsSave").removeClass("disabled");
+						});
+
+						$("#remoteSystemsSave").click(function() {
+							$("#remoteSystemsForm").submit();
+						});
+
+						$('.a_delete').click(function(event) {
+							onDeleteClick(event);
+						});
+
+						$('.a_edit').click(function(event) {
+							editOnClick(event);
+						});
+
+						$("#loginUrl").change(function(event, state) {
+							var rowIndex = $("#hiddenRemoteSystemIndex").val();
+							var value = $("#loginUrl").val();
+
+							$("#hiddenLoginUrl-" + rowIndex).val(value);
+						});
+
+						$("#remoteSystemLoginParameter")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemLoginParameter")
+													.val();
+
+											$(
+													"#hiddenLoginParameter-"
+															+ rowIndex).val(
+													value);
+										});
+
+						$("#remoteSystemPasswordParameter")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemPasswordParameter")
+													.val();
+
+											$(
+													"#hiddenPasswordParameter-"
+															+ rowIndex).val(
+													value);
+										});
+
+						$("#remoteSystemLogoutUrl")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemLogoutUrl")
+													.val();
+
+											$("#hiddenLogoutUrl-" + rowIndex)
+													.val(value);
+										});
+
+						$("#remoteSystemRequestMethod")
+								.change(
+										function(event, state) {
+											var rowIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var value = $(
+													"#remoteSystemRequestMethod")
+													.val();
+
+											$(
+													"#hiddenRequestMethod-"
+															+ rowIndex).val(
+													value);
+										});
+
+						$('#buttonRemoteSystemEditDone').click(function(event) {
+
+							$("#remoteSystemEditPanel").modal('hide');
+							$("table tbody tr").removeClass('highlight');
+						});
+
+						$("#tabs a").click(function(e) {
+							e.preventDefault();
+							$(this).tab('show');
+						});
+						
+						$("#buttonRemoteSystemConnectionTest").click(function(e) {
+							e.preventDefault();
+							
+							var testUrl = $('#loginUrl').val();
+			
+							$.ajax({ 
+							    url: "/admin/remotesystem/test", 
+							    type: 'GET',
+							    data : {
+    							"url" : testUrl
+    							}, 
+							    success: function(data) { 
+							        if (data == 'true')
+							        {
+							        	$("#connectionFailed").hide();
+							        	$("#connectionOk").show();
+							        }
+							        else
+							        {
+							        	$("#connectionOk").hide();
+										$("#connectionFailed").show();
+							        }
+							    }
+							});
+						});
+						
+						$(function(){
+    $("[data-hide]").on("click", function(){
+        $(this).closest("." + $(this).attr("data-hide")).hide();
+    });
+});
+
+						// manuelles onChange behandeln
+						$("[name='user-assignment-switch']")
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var collectionIndex = event.target.id
+													.split("-");
+
+											$(
+													"#hiddenAssignmentSwitchValue-"
+															+ collectionIndex[1])
+													.val(state);
+
+											var remoteSystemIndex = $(
+													"#hiddenRemoteSystemIndex")
+													.val();
+											var assignedUserRids = "";
+											// Status der Switches auslesen und zugeordnete Benutzer speichern
+											$("tr.userItem")
+													.each(
+															function() {
+																var userRid = $(
+																		this)
+																		.find(
+																				"input.hiddenUserRid")
+																		.val();
+
+																var isAssigned = $(
+																		this)
+																		.find(
+																				"input.assignmentSwitch")
+																		.bootstrapSwitch(
+																				'state');
+
+																if (isAssigned) {
+																	if (assignedUserRids.length == 0) {
+																		assignedUserRids = assignedUserRids
+																				+ userRid;
+																	} else {
+																		assignedUserRids = assignedUserRids
+																				+ ","
+																				+ userRid;
+																	}
+
+																}
+															});
+
+											$(
+													"#hiddenUserRids-"
+															+ remoteSystemIndex)
+													.val(assignedUserRids);
+
+											$("#remoteSystemsSave")
+													.removeClass("disabled");
+										});
+					});
+
+	function isUserAssigned(rid, assignedRids) {
+		var ridsArray = assignedRids.split(",");
+
+		for (var i = 0; i < ridsArray.length; i++) {
+			if (ridsArray[i] == rid) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	function editOnClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var assignedUserRids = $("#hiddenUserRids-" + collectionIndex[1]).val();
+		
+		// Meldungen ausblenden
+		$("#connectionOk").hide();
+		$("#connectionFailed").hide();
+
+		// bereits zugeordnete Benutzer initialisieren
+		$("tr.userItem")
+				.each(
+						function() {
+							var userRid = $(this).find("input.hiddenUserRid")
+									.val();
+
+							$(this).find("input.assignmentSwitch")
+									.bootstrapSwitch(
+											'state',
+											isUserAssigned(userRid,
+													assignedUserRids));
+
+						});
+
+		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#remoteSystemEditPanelHeadingName").text(" " + remoteSystemName);
+
+		// Login-URL setzen
+		var urlValue = $("#hiddenLoginUrl-" + collectionIndex[1]).val();
+		$("#loginUrl").val(urlValue);
+
+		// Login-Parameter setzen
+		var loginParamValue = $("#hiddenLoginParameter-" + collectionIndex[1])
+				.val();
+		$("#remoteSystemLoginParameter").val(loginParamValue);
+
+		// Passwort-Parameter setzen
+		var passwordParamValue = $(
+				"#hiddenPasswordParameter-" + collectionIndex[1]).val();
+		$("#remoteSystemPasswordParameter").val(passwordParamValue);
+
+		// Logout-URL setzen
+		var urlLogoutValue = $("#hiddenLogoutUrl-" + collectionIndex[1]).val();
+		$("#remoteSystemLogoutUrl").val(urlLogoutValue);
+
+		// Request-Methode setzen
+		var requestMethodValue = $("#hiddenRequestMethod-" + collectionIndex[1])
+				.val();
+
+		if (requestMethodValue) {
+			$("#remoteSystemRequestMethod").val(requestMethodValue);
+		} else {
+			$("#remoteSystemRequestMethod").val("true");
+		}
+
+		$("#remoteSystemEditPanel").modal('show');
+
+		// Zuordnung EditPanel zu Fremdsystem festlegen
+		$("#hiddenRemoteSystemIndex").val(collectionIndex[1]);
+
+		// Row highlighting
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
+	}
+
+	function onDeleteClick(event) {$( ".result" ).html( data );
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var row = $(event.target).parent().parent().parent();
+
+		$("#hiddenDelete-" + collectionIndex[1]).val(true);
+		$("#remoteSystemsSave").removeClass("disabled");
+
+		// Editierfenster ausblenden
+		var remoteSystemName = $("#name-" + collectionIndex[1]).val();
+		var remoteSystemEditPanel = $("#remoteSystemEditPanelHeadingName")
+				.text();
+
+		if (" " + remoteSystemName == remoteSystemEditPanel) {
+			$("#remoteSystemEditPanel").modal('hide');
+		}
+
+		row.hide();
+	}
+
+	/*]]>*/
+		</script>
+
+		<style type="text/css">
+			body {
+			padding-top: 127px;
+			}
+		</style>
+
+	</head>
+	<body>
+		<!-- {!begin layout} -->
+		<div th:include="layout :: header"></div>
+		<!-- {!end layout} -->
+
+		<div class="wrapper" id="wrapper">
+			<!-- div class="row" -->
+
+			<!-- {!begin navigation} -->
+			<div
+				th:include="feature/administration/adminmenu :: navigation('remotesystem', 'remotesystem')"
+				id="navigation" class="navigation"></div>
+			<!-- {!end navigation} -->
+
+			<div id="content" class="content">
+				<nav class="navbar navbar-default navbar-top sub-nav">
+					<div class="container-fluid">
+						<div class="navbar-header">
+							<div class="navbar-brand navbar-text-submenu">
+								<span th:text="#{remoteSystemTitle}"></span>
+							</div>
+						</div>
+						<div class="collapse navbar-collapse">
+							<ul class="nav navbar-right">
+								<button type="button" class="btn btn-ws btn-default navbar-btn"
+									id="remoteSystemsAddRow">
+									<span th:text="#{remoteSystemsActionNew}"></span>
+								</button>
+								<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+									id="remoteSystemsSave">
+									<span th:text="#{remoteSystemsActionSave}"></span>
+								</button>
+								<a class="glyph-link" href="/admin/remotesystem">
+									<span class="glyphicon glyphicon-refresh"></span>
+								</a>
+							</ul>
+						</div>
+					</div>
+				</nav>
+				<div class="container-fluid">
+
+					<form id="remoteSystemsForm" role="form"
+						th:action="@{/admin/remotesystem/save}" method="post"
+						th:object="${remoteSystemConfig}">
+
+						<div th:if="${#fields.hasErrors('*')}" class="alert alert-danger alert-dismissible fade in"
+							role="alert">
+							<button type="button" class="close" data-dismiss="alert"
+								aria-label="Close">
+								<span aria-hidden="true">&times;
+								</span>
+							</button>
+							<strong>
+								<span th:text="#{remoteSystemsTableErrorMessage}"></span>
+							</strong>
+						</div>
+
+						<table class="table table-hover table-striped table-condensed"
+							id="remoteSystemTable">
+							<thead>
+								<tr>
+									<th>
+										<span th:text="#{remoteSystemsTableName}"></span>
+									</th>
+									<th>
+										<span th:text="#{remoteSystemsTableDescription}"></span>
+									</th>
+									<th>
+										<span th:text="#{remoteSystemsTableStatus}"></span>
+									</th>
+									<th>
+										<span th:text="#{remoteSystemsTableActions}"></span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item, stat : *{remoteSystems}">
+									<td>
+										<input th:id="${'name-'+stat.index}" type="text" class="form-control"
+											th:placeholder="#{remoteSystemsTableName}" th:field="*{remoteSystems[__${stat.index}__].name}"
+											th:errorclass="field-tip" />
+										<span class="tip-content" th:errors="*{remoteSystems[__${stat.index}__].name}"></span>
+									</td>
+									<td>
+										<input th:id="${'description-'+stat.index}" type="text"
+											class="form-control" th:placeholder="#{remoteSystemsTableDescription}"
+											th:field="*{remoteSystems[__${stat.index}__].description}"
+											th:errorclass="field-tip" />
+										<span class="tip-content"
+											th:errors="*{remoteSystems[__${stat.index}__].description}"></span>
+									</td>
+									<td>
+										<input th:id="${'switch-'+stat.index}" type="checkbox"
+											name="remoteSystem-state-switch" data-size="mini"
+											th:checked="*{remoteSystems[__${stat.index}__].enabled}"
+											data-on-color="success" data-off-color="warning"></input>
+										<input type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].enabled}" />
+									</td>
+									<td>
+										<a class="a_delete" th:id="${'a_delete-'+stat.index}" href="#"
+											th:title="#{remoteSystemsActionDelete}">
+											<span class="glyphicon glyphicon-remove">
+											</span>
+										</a>
+										<a class="a_edit" th:id="${'a_edit-'+stat.index}" href="#"
+											th:title="#{remoteSystemsActionEdit}">
+											<span class="glyphicon glyphicon-edit">
+											</span>
+										</a>
+										<input type="hidden" th:id="${'hiddenRid-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].id}" />
+										<input type="hidden" th:id="${'hiddenDelete-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].delete}" />
+										<input type="hidden" th:id="${'hiddenLoginUrl-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].loginUrl}" />
+										<input type="hidden" th:id="${'hiddenLoginParameter-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].loginParameter}" />
+										<input type="hidden" th:id="${'hiddenPasswordParameter-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].passwordParameter}" />
+										<input type="hidden" th:id="${'hiddenLogoutUrl-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].logoutUrl}" />
+										<input type="hidden" th:id="${'hiddenRequestMethod-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].doPostRequest}" />
+										<input type="hidden" th:id="${'hiddenUserRids-'+stat.index}"
+											th:field="*{remoteSystems[__${stat.index}__].assignedUserIds}" />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div id="remoteSystemEditPanel" class="modal modal-dock-to-navigation">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">
+											<span th:text="#{remoteSystemEditPanelHeader}"></span>
+											<span id="remoteSystemEditPanelHeadingName"></span>
+										</h5>
+									</div>
+									<div class="modal-body">
+										<div id="connectionOk" class="alert alert-success alert-dismissible fade in"
+											role="alert">
+											<button type="button" class="close" data-hide="alert"
+												aria-label="Close">
+												<span aria-hidden="true">&times;
+												</span>
+											</button>
+											<strong>
+												<span th:text="#{remoteSystemConnectionOkMessage}"></span>
+											</strong>
+										</div>
+										<div id="connectionFailed" class="alert alert-danger alert-dismissible fade in"
+											role="alert">
+											<button type="button" class="close" data-hide="alert"
+												aria-label="Close">
+												<span aria-hidden="true">&times;
+												</span>
+											</button>
+											<strong>
+												<span th:text="#{remoteSystemConnectionFailedMessage}"></span>
+											</strong>
+										</div>
+										<ul class="nav nav-tabs" id="tabs">
+											<li class="active">
+												<a href="#sectionA">
+													<span th:text="#{remoteSystemPropertiesTab}"></span>
+												</a>
+											</li>
+											<li>
+												<a href="#sectionB">
+													<span th:text="#{remoteSystemUsersTab}"></span>
+												</a>
+											</li>
+										</ul>
+
+										<div class="tab-content">
+											<div id="sectionA" class="tab-pane fade in active">
+												<ul class="list-group">
+													<li class="list-group-item">
+														<div>
+															<label class="control-label">
+																<span th:text="#{remoteSystemLoginUrlLabel}"></span>
+															</label>
+															<div>
+																<input type="text" class="form-control" id="loginUrl"
+																	th:placeholder="#{remoteSystemLoginUrlLabel}" />
+															</div>
+														</div>
+													</li>
+													<li class="list-group-item">
+														<div>
+															<label class="control-label">
+																<span th:text="#{remoteSystemLoginParameterLabel}"></span>
+															</label>
+															<div>
+																<input type="text" class="form-control"
+																	id="remoteSystemLoginParameter" th:placeholder="#{remoteSystemLoginParameterLabel}" />
+															</div>
+														</div>
+													</li>
+													<li class="list-group-item">
+														<div>
+															<label class="control-label">
+																<span th:text="#{remoteSystemPasswordParameterLabel}"></span>
+															</label>
+															<div>
+																<input type="text" class="form-control"
+																	id="remoteSystemPasswordParameter" th:placeholder="#{remoteSystemPasswordParameterLabel}" />
+															</div>
+														</div>
+													</li>
+													<li class="list-group-item">
+														<div>
+															<label class="control-label">
+																<span th:text="#{remoteSystemLogoutUrlLabel}"></span>
+															</label>
+															<div>
+																<input type="text" class="form-control" id="remoteSystemLogoutUrl"
+																	th:placeholder="#{remoteSystemLogoutUrlLabel}" />
+															</div>
+														</div>
+													</li>
+													<li class="list-group-item">
+														<div>
+															<label class="control-label">
+																<span th:text="#{remoteSystemRequestMethodLabel}"></span>
+															</label>
+															<div>
+																<select class="form-control" id="remoteSystemRequestMethod">
+																	<option value="true" th:text="#{remoteSystemRequestMethodPost}"></option>
+																	<option value="false" th:text="#{remoteSystemRequestMethodGet}"></option>
+																</select>
+															</div>
+														</div>
+													</li>
+												</ul>
+											</div>
+											<div id="sectionB" class="tab-pane fade">
+												<div class="margin-content">
+													<table class="table table-hover table-striped table-condensed"
+														id="userTable">
+														<thead>
+															<tr>
+																<th>
+																	<span th:text="#{usersTableLogin}"></span>
+																</th>
+																<th>
+																	<span th:text="#{usersTableFirstName}"></span>
+																</th>
+																<th>
+																	<span th:text="#{usersTableLastName}"></span>
+																</th>
+																<th>
+																	<span th:text="#{userAssigned}"></span>
+																</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr class="userItem" th:each="item, stat : *{availableUsers}">
+																<td>
+																	<span th:text="*{availableUsers[__${stat.index}__].login}"></span>
+																</td>
+																<td>
+																	<span th:text="*{availableUsers[__${stat.index}__].firstname}"></span>
+																</td>
+																<td>
+																	<span th:text="*{availableUsers[__${stat.index}__].lastname}"></span>
+																</td>
+																<td>
+																	<input class="assignmentSwitch" th:id="${'assignment-switch-'+stat.index}"
+																		type="checkbox" name="user-assignment-switch"
+																		data-size="mini" data-on-color="success"
+																		data-off-color="warning"></input>
+																	<input class="hiddenAssignmentSwitchValue" type="hidden"
+																		th:id="${'hiddenAssignmentSwitchValue-'+stat.index}"
+																		value="false" />
+																	<input class="hiddenUserRid" th:id="${'hiddenUserRid-'+stat.index}"
+																		type="hidden" th:field="*{availableUsers[__${stat.index}__].id}" />
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button id="buttonRemoteSystemEditDone" type="button"
+											class="btn btn-ws btn-primary btn-done" data-dismiss="modal">
+											<span th:text="#{buttonDone}"></span>
+										</button>
+										<button id="buttonRemoteSystemConnectionTest" type="button"
+											class="btn btn-ws btn-primary btn-done">
+											<span th:text="#{buttonRemoteSystemConnectionTest}"></span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<input id="hiddenRemoteSystemIndex" type="hidden" value="" />
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

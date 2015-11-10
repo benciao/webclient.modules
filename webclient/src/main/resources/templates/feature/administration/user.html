@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client- Mandantenkonfiguration</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/webclient.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-switch.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+<script th:src="@{/js/bootstrap-select.js}"></script>
+
+<script th:src="@{/js/bootstrap-switch.js}"></script>
+<script th:src="@{/js/bootstrap-colorpicker.js}"></script>
+<script th:src="@{/js/webclient.js}"></script>
+
+<script type="text/javascript" th:inline="text">
+	/*<![CDATA[*/
+	$(document)
+			.ready(
+					function() {
+						$('#usersAddRow')
+								.click(
+										function() {
+											var rowIndex = $('#userTable tbody')
+													.children().length;
+											$('#userTable tbody')
+													.append(
+															"<tr>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{usersTableLogin}]]' id='login-" + rowIndex + "' name='users[" + rowIndex + "].login' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<select class='form-control' id='type-" + rowIndex + "' name='users[" + rowIndex + "].internal'><option value='true' text='[[#{usersTypeSelectDb}]]'>[[#{usersTypeSelectDb}]]</option><option value='false' text='[[#{usersTypeSelectLdap}]]'>[[#{usersTypeSelectLdap}]]</option></select>"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{usersTableFirstName}]]' id='firstname-" + rowIndex + "' name='users[" + rowIndex + "].firstname' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{usersTableLastName}]]' id='lastname-" + rowIndex + "' name='users[" + rowIndex + "].lastname' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='user-state-switch' data-size='mini' data-checked='true' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='users[" + rowIndex + "].enabled' value='true' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<a href='#' class='a_delete' title='[[#{usersActionDelete}]]' id='a_delete-"+ rowIndex +"'><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"' title='[[#{usersActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='users["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='users[" + rowIndex + "].delete' value='false' />"
+																	+ "<input type='hidden' id='hiddenGroupRids-"+ rowIndex +"' name='users["+ rowIndex +"].groupIds'/>"
+																	+ "<input type='hidden' id='hiddenEmail-"+ rowIndex +"' name='users["+ rowIndex +"].email' />"
+																	+ "<input type='hidden' id='hiddenDefaultClient-"+ rowIndex +"' name='users["+ rowIndex +"].defaultClient' />"
+																	+ "<input type='hidden' id='hiddenChangePasswordOnNextLogin-"+ rowIndex +"' name='users["+ rowIndex +"].changePasswordOnNextLogin' />"
+																	+ "<input type='hidden' id='hiddenPassword-"+ rowIndex +"' name='users["+ rowIndex +"].password' />"
+																	+ "<input type='hidden' id='hiddenLoginAttempts-"+ rowIndex +"' name='users["+ rowIndex +"].loginAttempts' value='0' />"
+																	+ "</td>"
+																	+ "</tr>");
+
+											$('#a_delete-' + rowIndex).click(
+													function(event) {
+														onDeleteClick(event);
+													});
+
+											$('#switch-' + rowIndex)
+													.bootstrapSwitch()
+													.on(
+															'switchChange.bootstrapSwitch',
+															function(event,
+																	state) {
+																var collectionIndex = event.target.id
+																		.split("-");
+																$(
+																		"#hiddenSwitch-"
+																				+ collectionIndex[1])
+																		.val(
+																				state);
+																$("#usersSave")
+																		.removeClass(
+																				"disabled");
+															});
+
+											$("#usersSave").removeClass(
+													"disabled");
+
+											$("#hiddenSwitch-" + rowIndex).val(
+													false);
+
+											$('.a_edit').click(function(event) {
+												editOnClick(event);
+											});
+
+										});
+
+						$("#userEditPanel").modal('hide');
+						$("#pwChangeArea").hide();
+
+						$("[name='user-state-switch']").bootstrapSwitch().on(
+								'switchChange.bootstrapSwitch',
+								function(event, state) {
+									var collectionIndex = event.target.id
+											.split("-");
+									$("#hiddenSwitch-" + collectionIndex[1])
+											.val(state);
+									$("#usersSave").removeClass("disabled");
+								});
+
+						$("#pw-change-on-next-login-switch").bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var userIndex = $(
+													"#hiddenUserIndex").val();
+											$(
+													"#hiddenChangePasswordOnNextLogin-"
+															+ userIndex).val(
+													state);
+											$("#usersSave").removeClass(
+													"disabled");
+										});
+
+						$("#pw-change-switch").bootstrapSwitch().on(
+								'switchChange.bootstrapSwitch',
+								function(event, state) {
+									if (state) {
+										$("#pwChangeArea").show();
+									} else {
+										$("#pwChangeArea").hide();
+									}
+								});
+
+						$("#email").change(function(event, state) {
+							var userIndex = $("#hiddenUserIndex").val();
+							var value = $("#email").val();
+
+							$("#hiddenEmail-" + userIndex).val(value);
+						});
+
+						$('.form-control').change(function() {
+							$("#usersSave").removeClass("disabled");
+						});
+
+						$("#usersSave").click(function() {
+							$("#usersForm").submit();
+						});
+
+						$('.a_delete').click(function(event) {
+							onDeleteClick(event);
+						});
+
+						$('.a_unlock').click(function(event) {
+							onUnlockClick(event);
+						});
+
+						$('.a_edit').click(function(event) {
+							editOnClick(event);
+						});
+
+						$('#buttonUserEditDone').click(function(event) {
+
+							$("#userEditPanel").modal('hide');
+							$("table tbody tr").removeClass('highlight');
+						});
+
+						$("#password").on("keyup", function() {
+							var pass = $(this).val();
+							updateProgressBar(scorePassword(pass));
+						});
+
+						$("#clientGroupSelect").change(function() {
+							var clientId = $(this).val();
+							retrieveClientGroups(clientId);
+						});
+
+						$("#clientGroupSelect").ready(
+								function() {
+									var clientId = $(
+											"#clientGroupSelect option:first")
+											.val();
+									retrieveClientGroups(clientId);
+								});
+
+						$("#password-confirm")
+								.keyup(
+										function(event) {
+											var userIndex = $(
+													"#hiddenUserIndex").val();
+
+											if (validatePassword()) {
+												if ($("#pw-change-switch")
+														.bootstrapSwitch(
+																'state')) {
+													var userRid = $(
+															"#hiddenRid-"
+																	+ userIndex)
+															.val();
+
+													$(
+															"#hiddenPassword-"
+																	+ userIndex)
+															.val(
+																	$(
+																			"#password-confirm")
+																			.val(),
+																	userRid);
+													$("#password-confirm")
+															.removeClass(
+																	'invalidPassword');
+
+												} else {
+													$(
+															"#hiddenPassword-"
+																	+ userIndex)
+															.val(null);
+												}
+											} else {
+												$(
+														"#hiddenPassword-"
+																+ userIndex)
+														.val(null);
+												$("#password-confirm")
+														.addClass(
+																'invalidPassword');
+											}
+										});
+
+						$("#tabs a").click(function(e) {
+							e.preventDefault();
+							$(this).tab('show');
+						});
+					});
+
+	function determinAvailableClients() {
+		var url = '/admin/user/availableClients';
+		var userIndex = $("#hiddenUserIndex").val();
+		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
+		var uRid = $("#hiddenRid-" + userIndex).val();
+
+		url = url + '/' + assignedGroupRids + "/" + uRid;
+
+		$("#availableClientsResult").load(
+				url,
+				function() {
+					$("#defaultClientGroupSelect").change(
+							function(event, state) {
+								var userIndex = $("#hiddenUserIndex").val();
+								var selected = $("#defaultClientGroupSelect")
+										.val();
+								$("#hiddenDefaultClient-" + userIndex).val(
+										selected);
+							});
+
+					var userIndex = $("#hiddenUserIndex").val();
+
+					var hiddenSelectedClient = $(
+							"#hiddenDefaultClient-" + userIndex).val();
+
+					if (!hiddenSelectedClient) {
+						$("#hiddenDefaultClient-" + userIndex).val(
+								$("#defaultClientGroupSelect").val());
+					}
+				});
+
+	}
+
+	function retrieveClientGroups(clientId) {
+		var url = '/admin/user/clientgroups';
+
+		url = url + '/' + clientId;
+
+		$("#clientGroupsResult")
+				.load(
+						url,
+						function() {
+							$("[name='group-assignment-switch']")
+									.bootstrapSwitch()
+									.on(
+											'switchChange.bootstrapSwitch',
+											function(event, state) {
+												var collectionIndex = event.target.id
+														.split("-");
+
+												$(
+														"#hiddenGroupSwitchValue-"
+																+ collectionIndex[1])
+														.val(state);
+
+												var userIndex = $(
+														"#hiddenUserIndex")
+														.val();
+
+												var assignedGroupRids = $(
+														"#hiddenGroupRids-"
+																+ userIndex)
+														.val();
+
+												// Status der Switches auslesen und zugeordnete Gruppen speichern
+												$("tr.groupItem")
+														.each(
+																function() {
+																	var groupRid = $(
+																			this)
+																			.find(
+																					"input.hiddenGroupRid")
+																			.val();
+
+																	var switchOn = $(
+																			this)
+																			.find(
+																					"input.groupSwitch")
+																			.bootstrapSwitch(
+																					'state');
+
+																	if (switchOn) {
+																		if (assignedGroupRids.length == 0) {
+																			assignedGroupRids = assignedGroupRids
+																					+ groupRid;
+																		} else {
+																			if (!isGroupAssigned(
+																					groupRid,
+																					assignedGroupRids)) {
+																				assignedGroupRids = assignedGroupRids
+																						+ ","
+																						+ groupRid;
+																			}
+																		}
+																	} else {
+																		if (isGroupAssigned(
+																				groupRid,
+																				assignedGroupRids)) {
+																			assignedGroupRids = removeGroupRid(
+																					assignedGroupRids,
+																					groupRid);
+																		}
+																	}
+																});
+
+												$(
+														"#hiddenGroupRids-"
+																+ userIndex)
+														.val(assignedGroupRids);
+
+												$("#usersSave").removeClass(
+														"disabled");
+
+												// Auswahl für Standardmandant aktualisieren
+												determinAvailableClients();
+											});
+
+							var userIndex = $("#hiddenUserIndex").val();
+
+							if (userIndex) {
+								// bereits zugeordnete Gruppen initialisieren
+								setAssignedGroups(userIndex);
+							}
+						});
+	}
+
+	function editOnClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var userName = $("#login-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#userEditPanelHeadingName").text(" " + userName);
+
+		$("#pwChangeArea").hide();
+		$("#pw-change-switch").bootstrapSwitch('state', false);
+
+		// Zuordnung EditPanel zu Benutzer festlegen
+		$("#hiddenUserIndex").val(collectionIndex[1]);
+
+		// Row highlighting
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
+
+		// PW Change Switch setzen
+		var state = $("#hiddenChangePasswordOnNextLogin-" + collectionIndex[1])
+				.val();
+		$("#pw-change-on-next-login-switch").bootstrapSwitch('state',
+				(state == 'false') ? false : true);
+
+		// DefaultClient setzen
+		var currentSelectedClient = $(
+				"#hiddenDefaultClient-" + collectionIndex[1]).val();
+		$("#defaultClientGroupSelect").val(currentSelectedClient);
+
+		// Email setzen
+		var emailValue = $("#hiddenEmail-" + collectionIndex[1]).val();
+		$("#email").val(emailValue);
+
+		// Passwortänderungsdatum setzen
+		var pwChangedValue = $("#hiddenPwChangedValue-" + collectionIndex[1])
+				.val();
+		$("#pwChangedDate").val(pwChangedValue);
+
+		// Passwort setzen
+		var pw = $("#hiddenPassword-" + collectionIndex[1]).val();
+
+		if (pw) {
+			$("#password").val(pw);
+			$("#password-confirm").val(pw);
+			$("#pw-change-switch").bootstrapSwitch('state', true);
+		} else {
+			$("#password").val(null);
+			$("#password-confirm").val(null);
+			$("#pw-change-switch").bootstrapSwitch('state', false);
+		}
+
+		// bereits zugeordnete Gruppen initialisieren
+		setAssignedGroups(collectionIndex[1]);
+
+		// Auswahl für Standardmandant aktualisieren
+		determinAvailableClients();
+
+		$("#userEditPanel").modal('show');
+	}
+
+	function onDeleteClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var row = $(event.target).parent().parent().parent();
+
+		$("#hiddenDelete-" + collectionIndex[1]).val(true);
+		$("#usersSave").removeClass("disabled");
+
+		// Editierfenster ausblenden
+		var userName = $("#login-" + collectionIndex[1]).val();
+		var userEditPanel = $("#userEditPanelHeadingName").text();
+
+		if (" " + userName == userEditPanel) {
+			$("#userEditPanel").modal('hide');
+		}
+
+		row.hide();
+	}
+
+	function onUnlockClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var row = $(event.target).parent().parent().parent();
+
+		$("#hiddenAccountLocked-" + collectionIndex[1]).val(false);
+		$("#hiddenLoginAttempts-" + collectionIndex[1]).val(0);
+		$("#usersSave").removeClass("disabled");
+
+		$(event.target).hide();
+	}
+
+	function setAssignedGroups(userIndex) {
+		var assignedGroupRids = $("#hiddenGroupRids-" + userIndex).val();
+
+		$("tr.groupItem").each(
+				function() {
+					var groupRid = $(this).find("input.hiddenGroupRid").val();
+
+					$(this).find("input.groupSwitch").bootstrapSwitch('state',
+							isGroupAssigned(groupRid, assignedGroupRids));
+
+				});
+	}
+
+	function isGroupAssigned(rid, assignedRids) {
+
+		var ridsArray = assignedRids.split(",");
+
+		for (var i = 0; i < ridsArray.length; i++) {
+			if (ridsArray[i] == rid) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	function removeGroupRid(groupRids, ridToRemove) {
+		var groupRidsArray = groupRids.split(",");
+
+		var index = groupRidsArray.indexOf(ridToRemove);
+
+		if (index > -1) {
+			groupRidsArray.splice(index, 1);
+			var result = "";
+
+			for (var i = 0; i < groupRidsArray.length; i++) {
+				if (result.length == 0) {
+					result = result + groupRidsArray[i];
+				} else {
+					result = result + "," + groupRidsArray[i];
+				}
+			}
+
+			return result;
+
+		} else {
+			return groupRids;
+		}
+	}
+
+	/*]]>*/
+</script>
+
+<style type="text/css">
+body {
+	padding-top: 127px;
+}
+</style>
+
+</head>
+<body>
+	<!-- {!begin layout} -->
+	<div th:include="layout :: header"></div>
+	<!-- {!end layout} -->
+
+	<div class="wrapper" id="wrapper">
+		<!-- div class="row"-->
+
+		<!-- {!begin navigation} -->
+		<div
+			th:include="feature/administration/adminmenu :: navigation('user', 'user')"
+			id="navigation" class="navigation"></div>
+		<!-- {!end navigation} -->
+
+		<div id="content" class="content">
+			<nav class="navbar navbar-default navbar-top sub-nav">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<div class="navbar-brand navbar-text-submenu">
+							<span th:text="#{userTitle}"></span>
+						</div>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-right">
+							<button type="button" class="btn btn-ws btn-default navbar-btn"
+								id="usersAddRow">
+								<span th:text="#{usersActionNew}"></span>
+							</button>
+							<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+								id="usersSave">
+								<span th:text="#{usersActionSave}"></span>
+							</button>
+							<a class="glyph-link" href="/admin/user"><span
+								class="glyphicon glyphicon-refresh"></span></a>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class="container-fluid">
+
+				<form id="usersForm" role="form" th:action="@{/admin/user/save}"
+					method="post" th:object="${userConfig}">
+
+					<div th:if="${#fields.hasErrors('*')}"
+						class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<strong><span th:text="#{usersTableErrorMessage}"></span></strong>
+					</div>
+
+					<table class="table table-hover table-striped table-condensed"
+						id="userTable">
+						<thead>
+							<tr>
+								<th><span th:text="#{usersTableLogin}"></span></th>
+								<th><span th:text="#{usersTableType}"></span></th>
+								<th><span th:text="#{usersTableFirstName}"></span></th>
+								<th><span th:text="#{usersTableLastName}"></span></th>
+								<th><span th:text="#{usersTableStatus}"></span></th>
+								<th><span th:text="#{usersTableActions}"></span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item, stat : *{users}">
+								<td><input th:id="${'login-'+stat.index}" type="text"
+									class="form-control" placeholder="Login"
+									th:field="*{users[__${stat.index}__].login}"
+									th:errorclass="field-tip" /><span class="tip-content"
+									th:errors="*{users[__${stat.index}__].login}"></span></td>
+								<td><select class="form-control"
+									th:id="${'type-'+stat.index}"
+									th:field="*{users[__${stat.index}__].internal}">
+										<option th:value="true" th:text="#{usersTypeSelectDb}"
+											th:selected="*{users[__${stat.index}__].internal}"></option>
+										<option th:value="false" th:text="#{usersTypeSelectLdap}"
+											th:selected="*{users[__${stat.index}__].internal}"></option>
+								</select></td>
+								<td><input th:id="${'firstname-'+stat.index}" type="text"
+									class="form-control" placeholder="Vorname"
+									th:field="*{users[__${stat.index}__].firstname}"
+									th:errorclass="field-tip" /><span class="tip-content"
+									th:errors="*{users[__${stat.index}__].firstname}"></span></td>
+								<td><input th:id="${'lastname-'+stat.index}" type="text"
+									class="form-control" placeholder="Nachname"
+									th:field="*{users[__${stat.index}__].lastname}"
+									th:errorclass="field-tip" /><span class="tip-content"
+									th:errors="*{users[__${stat.index}__].lastname}"></span></td>
+								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
+									name="user-state-switch" data-size="mini"
+									th:checked="*{users[__${stat.index}__].enabled}"
+									data-on-color="success" data-off-color="warning"></input> <input
+									type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
+									th:field="*{users[__${stat.index}__].enabled}" /></td>
+								<td><a class="a_delete" th:id="${'a_delete-'+stat.index}"
+									href="#" th:title="#{usersActionDelete}"><span
+										class="glyphicon glyphicon-remove"> </span></a> <a class="a_edit"
+									th:id="${'a_edit-'+stat.index}" href="#"
+									th:title="#{usersActionEdit}"><span
+										class="glyphicon glyphicon-edit"> </span></a> <a
+									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
+									th:if="*{users[__${stat.index}__].login} != ${#authentication.name} and ${beans.applicationUtil.isLoginAsUserAllowed()}"
+									class="a_login-as" th:id="${'a_login-as-'+stat.index}"
+									th:href="'/admin/user/loginas/' + *{users[__${stat.index}__].id}"
+									th:title="#{usersActionLoginAs}"><span
+										class="glyphicon glyphicon-random"> </span></a> <a
+									sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')"
+									th:if="*{users[__${stat.index}__].accountLocked}"
+									class="a_unlock" th:id="${'a_unlock-'+stat.index}" href="#"
+									th:title="#{usersActionUnlock}"><span
+										class="glyphicon glyphicon-lock"> </span></a> <input type="hidden"
+									th:id="${'hiddenRid-'+stat.index}"
+									th:field="*{users[__${stat.index}__].id}" /><input
+									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
+									th:field="*{users[__${stat.index}__].delete}" /><input
+									type="hidden" th:id="${'hiddenGroupRids-'+stat.index}"
+									th:field="*{users[__${stat.index}__].groupIds}" /> <input
+									type="hidden" th:id="${'hiddenEmail-'+stat.index}"
+									th:field="*{users[__${stat.index}__].email}" /> <input
+									type="hidden" th:id="${'hiddenPwChangedValue-'+stat.index}"
+									th:field="*{{users[__${stat.index}__].passwortChangedTimeStamp}}" />
+									<input type="hidden"
+									th:id="${'hiddenDefaultClient-'+stat.index}"
+									th:field="*{users[__${stat.index}__].defaultClient}" /> <input
+									type="hidden"
+									th:id="${'hiddenChangePasswordOnNextLogin-'+stat.index}"
+									th:field="*{users[__${stat.index}__].changePasswordOnNextLogin}" /><input
+									type="hidden" th:id="${'hiddenPassword-'+stat.index}"
+									th:field="*{users[__${stat.index}__].password}" /> <input
+									type="hidden" th:id="${'hiddenAccountLocked-'+stat.index}"
+									th:field="*{users[__${stat.index}__].accountLocked}" /> <input
+									type="hidden" th:id="${'hiddenLoginAttempts-'+stat.index}"
+									th:field="*{users[__${stat.index}__].loginAttempts}" /></td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="userEditPanel" class="modal modal-dock-to-navigation">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">
+										<span th:text="#{userEditPanelHeader}"></span><span
+											id="userEditPanelHeadingName"></span>
+									</h5>
+								</div>
+								<div class="modal-body">
+									<ul class="nav nav-tabs" id="tabs">
+										<li class="active"><a href="#propertySection">Eigenschaften</a></li>
+										<li><a href="#groupSection">Gruppenzuordnung</a></li>
+									</ul>
+
+									<div class="tab-content">
+										<div id="propertySection" class="tab-pane fade in active">
+											<ul class="list-group">
+												<li class="list-group-item"><div
+														id="availableClientsResult"></div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{userEmailLabel}"></span></label>
+														<div>
+															<input type="email" class="form-control" id="email"
+																th:placeholder="#{userEmailLabel}" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{pwChangedLabel}"></span></label>
+														<div>
+															<input type="text" class="form-control"
+																id="pwChangedDate" th:placeholder="#{pwChangedLabel}"
+																readonly="true" />
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{userChangePwOnNextLogonLabel}"></span></label>
+														<div>
+															<input class="changePwOnNextLogonSwitch form-control"
+																name="pw-change-on-next-login-switch"
+																id="pw-change-on-next-login-switch" type="checkbox"
+																data-size="mini" data-on-color="success"
+																data-off-color="warning"></input>
+														</div>
+													</div></li>
+												<li class="list-group-item"><div>
+														<label class="control-label"><span
+															th:text="#{userChangePw}"></span></label>
+														<div>
+															<input class="changePwSwitch form-control"
+																id="pw-change-switch" type="checkbox" data-size="mini"
+																data-on-color="success" data-off-color="warning"></input>
+														</div>
+														<div id="pwChangeArea">
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPwLabel}"></span></label> <input type="password"
+																	class="form-control" id="password"
+																	th:placeholder="#{userPwLabel}" />
+															</div>
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPasswordConfirmLabel}"></span></label> <input
+																	type="password" class="form-control"
+																	id="password-confirm"
+																	th:placeholder="#{userPasswordConfirmLabel}" />
+															</div>
+															<div>
+																<label class="control-label"><span
+																	th:text="#{userPasswordScore}"></span></label>
+																<div class="progress">
+																	<div class="progress-bar" role="progressbar"
+																		id="password_progress_bar" aria-valuemin="0"
+																		aria-valuemax="100" style="width: 0%;"
+																		aria-valuenow="0"></div>
+																</div>
+															</div>
+														</div>
+													</div></li>
+											</ul>
+										</div>
+										<div id="groupSection" class="tab-pane fade">
+											<div class="margin-content">
+												<div>
+													<label class="control-label"><span
+														th:text="#{clientSelection}"></span></label> <select
+														id="clientGroupSelect" class="form-control">
+														<option
+															th:each="client : ${beans.authenticationUtil.getClients()}"
+															th:value="${client.id}" th:text="${client.name}">
+														</option>
+													</select>
+
+													<!-- Results block -->
+													<div id="clientGroupsResult"></div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button id="buttonUserEditDone" type="button"
+										class="btn btn-ws btn-primary btn-don" data-dismiss="modal">
+										<span th:text="#{buttonDone}"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<input id="hiddenUserIndex" type="hidden" value="" />
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div th:fragment="clientGroups" th:unless="${#lists.isEmpty(groups)}"
+		class="userEditClientGroups">
+		<table class="table table-hover table-striped table-condensed"
+			id="groupAssignmentTable">
+			<thead>
+				<tr>
+					<th><span th:text="#{groupsTableName}"></span></th>
+					<th><span th:text="#{groupsTableDescription}"></span></th>
+					<th><span th:text="#{groupAssigned}"></span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="groupItem" th:each="group, stat : ${groups}">
+					<td th:text="${group.name}"></td>
+					<td th:text="${group.description}"></td>
+					<td><input class="groupSwitch"
+						th:id="${'group-switch-'+stat.index}" type="checkbox"
+						name="group-assignment-switch" data-size="mini"
+						data-on-color="success" data-off-color="warning"></input> <input
+						type="hidden" th:id="${'hiddenGroupSwitchValue-'+stat.index}"
+						value="false" /><input class="hiddenGroupRid"
+						th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
+						th:value="${group.id}" /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div th:fragment="availableClients"
+		th:unless="${#lists.isEmpty(availableClients)}"
+		class="userAvailableClients">
+		<label class="control-label"><span th:text="#{clientDefault}"></span></label>
+		<select id="defaultClientGroupSelect" class="form-control">
+			<option th:each="client : ${availableClients}"
+				th:value="${client.id}" th:text="${client.name}"
+				th:selected="${client.id.toString() == defaultClient}"></option>
+		</select>
+	</div>
+</body>
+</html>

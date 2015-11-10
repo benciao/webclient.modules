@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client- Mandantenkonfiguration</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/webclient.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-switch.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+<script th:src="@{/js/bootstrap-select.js}"></script>
+<script th:src="@{/js/bootstrap-treeview.js}"></script>
+<script th:src="@{/js/bootstrap-switch.js}"></script>
+<script th:src="@{/js/bootstrap-colorpicker.js}"></script>
+<script th:src="@{/js/webclient.js}"></script>
+
+<script type="text/javascript" th:inline="text">
+	/*<![CDATA[*/
+	$(document)
+			.ready(
+					function() {
+						$('#groupsAddRow')
+								.click(
+										function() {
+											var rowIndex = $(
+													'#groupTable tbody')
+													.children().length;
+											$('#groupTable tbody')
+													.append(
+															"<tr>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{groupsTableName}]]' id='name-" + rowIndex + "' name='groups[" + rowIndex + "].name' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{groupsTableDescription}]]' id='description-" + rowIndex + "' name='groups[" + rowIndex + "].description' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='group-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='groups[" + rowIndex + "].enabled' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<a href='#' class='a_delete' title='[[#{groupsActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><a href='#' class='a_edit' id='a_edit-"+ rowIndex +"'' title='[[#{groupsActionEdit}]]'><span class='glyphicon glyphicon-edit'></span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='groups["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='groups[" + rowIndex + "].delete' value='false' /><input type='hidden' id='hiddenRoleRids-" + rowIndex +"' name='groups[" + rowIndex + "].roleIds' />"
+																	+ "</td>"
+																	+ "</tr>");
+
+											$('#a_delete-' + rowIndex)
+													.click(
+															function(event) {
+																var collectionIndex = $(
+																		event.target)
+																		.parent()
+																		.attr(
+																				'id')
+																		.split(
+																				"-");
+
+																var row = $(
+																		event.target)
+																		.parent()
+																		.parent()
+																		.parent();
+
+																$(
+																		"#hiddenDelete-"
+																				+ collectionIndex[1])
+																		.val(
+																				true);
+
+																$("#groupsSave")
+																		.removeClass(
+																				"disabled");
+
+																// Editierfenster ausblenden
+																var groupName = $(
+																		"#name-"
+																				+ collectionIndex[1])
+																		.val();
+																var roleEditPanel = $(
+																		"#roleEditPanelHeadingName")
+																		.text();
+
+																if (" "
+																		+ groupName == roleEditPanel) {
+																	$(
+																			"#roleEditPanel")
+																			.modal(
+																					'hide');
+																}
+
+																row.hide();
+															});
+
+											$('#switch-' + rowIndex)
+													.bootstrapSwitch()
+													.on(
+															'switchChange.bootstrapSwitch',
+															function(event,
+																	state) {
+																var collectionIndex = event.target.id
+																		.split("-");
+																$(
+																		"#hiddenSwitch-"
+																				+ collectionIndex[1])
+																		.val(
+																				state);
+																$("#groupsSave")
+																		.removeClass(
+																				"disabled");
+															});
+
+											$("#groupsSave").removeClass(
+													"disabled");
+
+											$("#hiddenSwitch-" + rowIndex).val(
+													false);
+
+											$('.a_edit').click(function(event) {
+												onEditClick(event);
+											});
+										});
+
+						$("[name='group-state-switch']").bootstrapSwitch().on(
+								'switchChange.bootstrapSwitch',
+								function(event, state) {
+									var collectionIndex = event.target.id
+											.split("-");
+									$("#hiddenSwitch-" + collectionIndex[1])
+											.val(state);
+									$("#groupsSave").removeClass("disabled");
+								});
+
+						$('.form-control').change(function() {
+							$("#groupsSave").removeClass("disabled");
+						});
+
+						$("#groupsSave").click(function() {
+							$("#groupsForm").submit();
+						});
+
+						$('.a_delete')
+								.click(
+										function(event) {
+											var collectionIndex = $(
+													event.target).parent()
+													.attr('id').split("-");
+
+											var row = $(event.target).parent()
+													.parent().parent();
+
+											$(
+													"#hiddenDelete-"
+															+ collectionIndex[1])
+													.val(true);
+											$("#groupsSave").removeClass(
+													"disabled");
+
+											// Editierfenster ausblenden
+											var groupName = $(
+													"#name-"
+															+ collectionIndex[1])
+													.val();
+											var roleEditPanel = $(
+													"#roleEditPanelHeadingName")
+													.text();
+
+											if (" " + groupName == roleEditPanel) {
+												$("#roleEditPanel").modal('hide');
+											}
+
+											row.hide();
+										});
+
+						$("#roleEditPanel").modal('hide');
+
+						// manuelles onChange behandeln
+						$("[name='role-assignment-switch']")
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var collectionIndex = event.target.id
+													.split("-");
+
+											$(
+													"#hiddenRoleSwitchValue-"
+															+ collectionIndex[1])
+													.val(state);
+
+											var groupIndex;
+											var assignedRoleRids = "";
+											// Status der Switches auslesen und zugeordnete Rolle speichern
+											$("tr.roleItem")
+													.each(
+															function() {
+																var roleRid = $(
+																		this)
+																		.find(
+																				"input.hiddenRoleRid")
+																		.val();
+
+																var isAssigned = $(
+																		this)
+																		.find(
+																				"input.roleSwitch")
+																		.bootstrapSwitch(
+																				'state');
+
+																groupIndex = $(
+																		this)
+																		.find(
+																				"input.hiddenGroupRid")
+																		.val();
+
+																if (isAssigned) {
+																	if (assignedRoleRids.length == 0) {
+																		assignedRoleRids = assignedRoleRids
+																				+ roleRid;
+																	} else {
+																		assignedRoleRids = assignedRoleRids
+																				+ ","
+																				+ roleRid;
+																	}
+
+																}
+															});
+
+											$("#hiddenRoleRids-" + groupIndex)
+													.val(assignedRoleRids);
+
+											$("#groupsSave").removeClass(
+													"disabled");
+										});
+
+						$('.a_edit').click(function(event) {
+							onEditClick(event);
+						});
+
+						$('#buttonRoleAssignmentDone').click(function(event) {
+
+							$("#roleEditPanel").modal('hide');
+							$("table tbody tr").removeClass('highlight');
+						});
+
+					});
+
+	function isRoleAssigned(rid, assignedRids) {
+		var ridsArray = assignedRids.split(",");
+
+		for (var i = 0; i < ridsArray.length; i++) {
+			if (ridsArray[i] == rid) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	function onEditClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var groupName = $("#name-" + collectionIndex[1]).val();
+
+		var assignedRoleRids = $("#hiddenRoleRids-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#roleEditPanelHeadingName").text(" " + groupName);
+
+		// GruppenId an allen Rollen setzen (notwendig wegen onChange Event an Switches)
+		$("tr.roleItem").each(function() {
+			$(this).find("input.hiddenGroupRid").val(collectionIndex[1]);
+		});
+
+		// bereits zugeordnete Rollen initialisieren
+		$("tr.roleItem").each(
+				function() {
+					var roleRid = $(this).find("input.hiddenRoleRid").val();
+
+					$(this).find("input.roleSwitch").bootstrapSwitch('state',
+							isRoleAssigned(roleRid, assignedRoleRids));
+
+				});
+
+		$("#roleEditPanel").modal('show');
+
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
+	}
+
+	/*]]>*/
+</script>
+
+<style type="text/css">
+body {
+	padding-top: 127px;
+}
+</style>
+
+</head>
+<body>
+	<!-- {!begin layout} -->
+	<div th:include="layout :: header"></div>
+	<!-- {!end layout} -->
+
+	<div class="wrapper" id="wrapper">
+		<!-- div class="row" -->
+
+		<!-- {!begin navigation} -->
+		<div
+			th:include="feature/administration/adminmenu :: navigation('group', 'user')"
+			id="navigation" class="navigation"></div>
+		<!-- {!end navigation} -->
+
+		<div id="content" class="content">
+			<nav class="navbar navbar-default navbar-top sub-nav">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<div class="navbar-brand navbar-text-submenu">
+							<span th:text="#{groupTitle}"></span>
+						</div>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-right">
+							<button type="button" class="btn btn-ws btn-default navbar-btn"
+								id="groupsAddRow">
+								<span th:text="#{groupsActionNew}"></span>
+							</button>
+							<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+								id="groupsSave">
+								<span th:text="#{rolesActionSave}"></span>
+							</button>
+							<a class="glyph-link" href="/admin/usergroup"> <span
+								class="glyphicon glyphicon-refresh"></span>
+							</a>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class="container-fluid">
+
+				<form id="groupsForm" role="form"
+					th:action="@{/admin/usergroup/save}" method="post"
+					th:object="${groupConfig}">
+
+					<div th:if="${#fields.hasErrors('*')}"
+						class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-label="Close">
+							<span aria-hidden="true">&times; </span>
+						</button>
+						<strong> <span th:text="#{groupsTableErrorMessage}"></span>
+						</strong>
+					</div>
+
+					<table class="table table-hover table-striped table-condensed"
+						id="groupTable">
+						<thead>
+							<tr>
+								<th><span th:text="#{groupsTableName}"></span></th>
+								<th><span th:text="#{groupsTableDescription}"></span></th>
+								<th><span th:text="#{groupsTableStatus}"></span></th>
+								<th><span th:text="#{groupsTableActions}"></span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item, stat : *{groups}">
+								<td><input th:id="${'name-'+stat.index}" type="text"
+									class="form-control" placeholder="Name"
+									th:field="*{groups[__${stat.index}__].name}"
+									th:errorclass="field-tip" /> <span class="tip-content"
+									th:errors="*{groups[__${stat.index}__].name}"></span></td>
+								<td><input th:id="${'description-'+stat.index}" type="text"
+									class="form-control" placeholder="Beschreibung"
+									th:field="*{groups[__${stat.index}__].description}"
+									th:errorclass="field-tip" /> <span class="tip-content"
+									th:errors="*{groups[__${stat.index}__].description}"></span></td>
+								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
+									name="group-state-switch" data-size="mini"
+									th:checked="*{groups[__${stat.index}__].enabled}"
+									data-on-color="success" data-off-color="warning"></input> <input
+									type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
+									th:field="*{groups[__${stat.index}__].enabled}" /></td>
+								<td><a class="a_delete" th:id="${'a_delete-'+stat.index}"
+									href="#" th:title="#{groupsActionDelete}"> <span
+										class="glyphicon glyphicon-remove"> </span>
+								</a> <a class="a_edit" th:id="${'a_edit-'+stat.index}" href="#"
+									th:title="#{groupsActionEdit}"> <span
+										class="glyphicon glyphicon-edit"> </span>
+								</a> <input type="hidden" th:id="${'hiddenRid-'+stat.index}"
+									th:field="*{groups[__${stat.index}__].id}" /> <input
+									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
+									th:field="*{groups[__${stat.index}__].delete}" /> <input
+									type="hidden" th:id="${'hiddenRoleRids-'+stat.index}"
+									th:field="*{groups[__${stat.index}__].roleIds}" /></td>
+							</tr>
+						</tbody>
+						<input type="hidden" id="hiddenClientId" th:field="*{clientId}" />
+					</table>
+
+					<!-- Modal -->
+					<div id="roleEditPanel" class="modal modal-dock-to-navigation">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">
+										<span th:text="#{groupRoleAssignmentHeader}"></span> <span
+											id="roleEditPanelHeadingName"></span>
+									</h5>
+								</div>
+								<div class="modal-body">
+									<table class="table table-hover table-striped table-condensed"
+										id="roleTable">
+										<thead>
+											<tr>
+												<th><span th:text="#{rolesTableName}"></span></th>
+												<th><span th:text="#{rolesTableDescription}"></span></th>
+												<th><span th:text="#{roleAssigned}"></span></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="roleItem" th:each="item, stat : *{roles}">
+												<td><span th:text="*{roles[__${stat.index}__].name}"></span>
+												</td>
+												<td><span
+													th:text="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}"></span>
+												</td>
+												<td><input class="roleSwitch"
+													th:id="${'role-switch-'+stat.index}" type="checkbox"
+													name="role-assignment-switch" data-size="mini"
+													data-on-color="success" data-off-color="warning"></input> <input
+													class="hiddenRoleSwitchValue" type="hidden"
+													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
+													value="false" /> <input class="hiddenRoleRid"
+													th:id="${'hiddenRoleRid-'+stat.index}" type="hidden"
+													th:field="*{roles[__${stat.index}__].id}" /> <input
+													class="hiddenGroupRid"
+													th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
+													value="" /></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="modal-footer">
+									<button id="buttonRoleAssignmentDone" type="button"
+										class="btn btn-ws btn-primary btn-don" data-dismiss="modal">
+										<span th:text="#{buttonDone}"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+$(document).ready(function() {
+							$('#userSelect').multiselect({
+								enableFiltering : true,
+								inheritClass: true,
+								nonSelectedText: '[[#{selectUserText}]]',
+								buttonWidth: '300px',
+								allSelectedText: '[[#{selectUserAllSelectedText}]]',
+								filterPlaceholder: '[[#{selectUserFilterText}]]'
+							});
+						});
+
+<div class="margin-content">
+													<div class="container-fluid">
+														<label class="control-label">
+															<span th:text="#{userSelection}"></span>
+														</label>
+													</div>
+													<div class="container-fluid">
+														<div class="btn-group">
+															<select id="userSelect" class="form-control"
+																th:name="selectedUser" multiple="multiple">
+																<option th:each="item, stat : *{availableUsers}"
+																	th:value="*{availableUsers[__${stat.index}__].id}"
+																	th:text="*{availableUsers[__${stat.index}__].firstname} + ' ' +*{availableUsers[__${stat.index}__].lastname}">
+																</option>
+															</select>
+															<button id="addUserButton" type="button" class="btn">
+																<span th:text="#{buttonAddUser}"></span>
+															</button>
+														</div>
+													</div>
+												</div>

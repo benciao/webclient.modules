@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client- Abwicklung</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/webclient.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+<script th:src="@{/js/bootstrap-select.js}"></script>
+<script th:src="@{/js/bootstrap-treeview.js}"></script>
+<script th:src="@{/js/webclient.js}"></script>
+
+<style type="text/css">
+body {
+	padding-top: 127px;
+}
+</style>
+
+</head>
+<body>
+	<!-- {!begin layout} -->
+	<div th:include="layout :: header"></div>
+	<!-- {!end layout} -->
+
+	<div class="wrapper" id="wrapper">
+		<!-- div class="row"-->
+		<div id="navigation" class="navigation">
+
+			<div id="submenu" class="container navigation-submenu">
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									href="#collapseOne"><span
+									class="glyphicon glyphicon-home"> </span>Mandanten</a>
+							</h4>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse in">
+							<div class="panel-body">
+								<table class="table">
+									<tr>
+										<td><span class="glyphicon glyphicon-pencil text-primary"></span><a
+											href="http://www.jquery2dotnet.com">Eigenschaften</a></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									href="#collapseTwo"><span class="glyphicon glyphicon-th">
+								</span>Benutzer</a>
+							</h4>
+						</div>
+						<div id="collapseTwo" class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table">
+									<tr>
+										<td><a href="http://www.jquery2dotnet.com">Benutzer</a></td>
+									</tr>
+									<tr>
+										<td><a href="http://www.jquery2dotnet.com">Gruppen</a></td>
+									</tr>
+									<tr>
+										<td><a href="http://www.jquery2dotnet.com">Rollen</a>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion"
+									href="#collapseThree"><span
+									class="glyphicon glyphicon-user"> </span>Systeme</a>
+							</h4>
+						</div>
+						<div id="collapseThree" class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table">
+									<tr>
+										<td><a href="http://www.jquery2dotnet.com">Fremdsysteme</a></td>
+									</tr>
+									<tr>
+										<td><a href="http://www.jquery2dotnet.com">Zugang</a></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="separator"></div>
+			<div class="separator-content">
+				<a href="javascript:toggle_sub_menu_visibility();"> <img
+					th:src="@{'/icons/separator_clickable.png'}"></img>
+				</a>
+			</div>
+		</div>
+		<div id="content" class="content"></div>
+		<!-- /div-->
+	</div>
+</body>
+</html>

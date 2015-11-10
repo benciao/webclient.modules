@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/login.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+<script th:src="@{/js/login.js}"></script>
+
+<script type="text/javascript" th:inline="text">
+	$(document).ready(function() {
+		$("#password").keyup(function(event) {
+
+			if (validatePassword()) {
+
+				$("#password-confirm").removeClass('invalidPassword');
+				$("#submitButton").removeClass("disabled");
+
+			} else {
+
+				$("#password-confirm").addClass('invalidPassword');
+				$("#submitButton").addClass("disabled");
+			}
+		});
+
+		$("#password-confirm").keyup(function(event) {
+
+			if (validatePassword()) {
+
+				$("#password-confirm").removeClass('invalidPassword');
+				$("#submitButton").removeClass("disabled");
+
+			} else {
+
+				$("#password-confirm").addClass('invalidPassword');
+				$("#submitButton").addClass("disabled");
+			}
+		});
+
+		$("#password").on("keyup", function() {
+			var pass = $(this).val();
+			updateProgressBar(scorePassword(pass));
+		});
+
+		$('#submitButton').click(function() {
+			$(".form-change-pw").submit();
+		});
+	});
+</script>
+
+<style type="text/css">
+body {
+	padding-top: 300px;
+	background-color: #e3e3e3;
+}
+
+.col-md-4 {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+</style>
+
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div class="panel panel-primary col-md-4 col-md-offset-4">
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					<img alt="MTS Web Client" th:src="@{/icons/logo_32_white.png}" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MTS
+					Web Client - <label th:text="#{force.pw.change}"></label>
+				</h2>
+			</div>
+			<div class="panel-body">
+				<form class="form-change-pw" role="form" th:action="@{/changepw}"
+					th:object="${newPassword}" method="post">
+					<div id="pwChangeArea">
+						<div>
+							<label class="control-label"><span
+								th:text="#{userPwLabel}"></span></label> <input type="password"
+								class="form-control" id="password"
+								th:placeholder="#{userPwLabel}" th:field="*{pw}" />
+						</div>
+						<div>
+							<label class="control-label"><span
+								th:text="#{userPasswordConfirmLabel}"></span></label> <input
+								type="password" class="form-control" id="password-confirm"
+								th:placeholder="#{userPasswordConfirmLabel}" />
+						</div>
+						<div>
+							<label class="control-label"><span
+								th:text="#{userPasswordScore}"></span></label>
+							<div class="progress">
+								<div class="progress-bar" role="progressbar"
+									id="password_progress_bar" aria-valuemin="0"
+									aria-valuemax="100" style="width: 0%;" aria-valuenow="0"></div>
+							</div>
+						</div>
+					</div>
+					<button class="btn btn-lg btn-primary btn-block disabled"
+						id="submitButton" th:text="#{change}"></button>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

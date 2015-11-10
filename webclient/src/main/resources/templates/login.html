@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/login.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+
+<script type="text/javascript" th:inline="text">
+	$(document).ready(function() {
+		$('#submitButton').click(function() {
+			$(".form-signin").submit();
+		});
+	});
+</script>
+
+<style type="text/css">
+body {
+	padding-top: 300px;
+	background-color: #e3e3e3;
+}
+
+.col-md-4 {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+</style>
+
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div class="panel panel-primary col-md-4 col-md-offset-4">
+			<div class="panel-heading">
+				<h2 class="panel-title">
+					<img alt="MTS Web Client" th:src="@{/icons/logo_32_white.png}" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MTS
+					Web Client
+				</h2>
+			</div>
+			<div class="panel-body">
+				<form class="form-signin" role="form" action="#"
+					th:action="@{/login}" method="post" authentication-failure-url="/login/error">
+					<label for="inputName" class="sr-only" th:text="#{username}" /><input
+						type="text" name="username" id="inputName" class="form-control"
+						th:placeholder="#{username}" required="true" autofocus="true" />
+					<label for="inputPassword" class="sr-only" th:text="#{password}" /><input
+						type="password" name="password" id="inputPassword"
+						class="form-control" th:placeholder="#{password}" required="true" />
+					<br></br>
+					<button class="btn btn-lg btn-primary btn-block" id="submitButton"
+						th:text="#{login}"></button>
+				</form>
+				<div th:if="${loginFailed}" class="alert alert-error">
+					<label th:text="#{${errorCause}}" />
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

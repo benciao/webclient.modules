@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<body>
+	<div th:fragment="navigation(selectedItem,collapseIn)">
+
+		<div id="submenu" class="container navigation-submenu">
+			<div class="panel-group" id="accordion">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseOne"> <span class="glyphicon glyphicon-home">
+							</span> <span th:text="#{menuTreeClient}"></span>
+							</a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'client'}" id="collapseOne"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Mandanten-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'client'}" class="warning">
+										<td><a href="/admin/client"> <span
+												th:text="#{menuTreeClientConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'client'}">
+										<td><a href="/admin/client"> <span
+												th:text="#{menuTreeClientConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Mandanteneigenschaften-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'properties'}" class="warning">
+										<td><a href="/admin/clientp"> <span
+												th:text="#{menuTreeClientProperties}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'properties'}">
+										<td><a href="/admin/clientp"> <span
+												th:text="#{menuTreeClientProperties}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+					<div th:if="${collapseIn != 'client'}" id="collapseOne"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Mandanten-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'client'}" class="warning">
+										<td><a href="/admin/client"> <span
+												th:text="#{menuTreeClientConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'client'}">
+										<td><a href="/admin/client"> <span
+												th:text="#{menuTreeClientConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Mandanteneigenschaften-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'properties'}" class="warning">
+										<td><a href="/admin/clientp"> <span
+												th:text="#{menuTreeClientProperties}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'properties'}">
+										<td><a href="/admin/clientp"> <span
+												th:text="#{menuTreeClientProperties}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseTwo"> <span class="glyphicon glyphicon-user">
+							</span> <span th:text="#{menuTreeUser}"></span>
+							</a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'user'}" id="collapseTwo"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Benutzer-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'user'}" class="warning">
+										<td><a href="/admin/user"> <span
+												th:text="#{menuTreeUserConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'user'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/user"> <span
+												th:text="#{menuTreeUserConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Gruppen-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'group'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/usergroup"> <span
+												th:text="#{menuTreeUserGroups}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'group'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/usergroup"> <span
+												th:text="#{menuTreeUserGroups}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Rollen-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'role'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/userrole"> <span
+												th:text="#{menuTreeUserRoles}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'role'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/userrole"> <span
+												th:text="#{menuTreeUserRoles}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Passwort-Ändern-Knoten -->
+								<tr th:if="${selectedItem == 'changepw'}" class="warning">
+									<td><a href="/changepw/user"> <span
+											th:text="#{menuTreeUserChangePw}"></span>
+									</a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'changepw'}">
+									<td><a href="/changepw/user"> <span
+											th:text="#{menuTreeUserChangePw}"></span>
+									</a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+
+					<div th:if="${collapseIn != 'user'}" id="collapseTwo"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Benutzer-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'user'}" class="warning">
+										<td><a href="/admin/user"> <span
+												th:text="#{menuTreeUserConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'user'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/user"> <span
+												th:text="#{menuTreeUserConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Gruppen-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'group'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/usergroup"> <span
+												th:text="#{menuTreeUserGroups}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'group'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/usergroup"> <span
+												th:text="#{menuTreeUserGroups}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Rollen-Knoten -->
+								<div sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+									<tr th:if="${selectedItem == 'role'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/userrole"> <span
+												th:text="#{menuTreeUserRoles}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'role'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/userrole"> <span
+												th:text="#{menuTreeUserRoles}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<!-- Passwort-Ändern-Knoten -->
+								<tr th:if="${selectedItem == 'changepw'}" class="warning">
+									<td><a href="/changepw/user"> <span
+											th:text="#{menuTreeUserChangePw}"></span>
+									</a></td>
+								</tr>
+								<tr th:if="${selectedItem != 'changepw'}">
+									<td><a href="/changepw/user"> <span
+											th:text="#{menuTreeUserChangePw}"></span>
+									</a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default"
+					sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseThree"> <span
+								class="glyphicon glyphicon-th"> </span> <span
+								th:text="#{menuTreeSystem}"></span>
+							</a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'system'}" id="collapseThree"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Feature-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'feature'}" class="warning">
+										<td><a href="/admin/feature"> <span
+												th:text="#{menuTreeFeatureConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'feature'}">
+										<td><a href="/admin/feature"> <span
+												th:text="#{menuTreeFeatureConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'environment'}" class="warning">
+										<td><a href="/admin/environment"> <span
+												th:text="#{menuTreeEnvironmentConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'environment'}">
+										<td><a href="/admin/environment"> <span
+												th:text="#{menuTreeEnvironmentConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'ldap'}" class="warning">
+										<td><a href="/admin/ldap"> <span
+												th:text="#{menuTreeLdapConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'ldap'}">
+										<td><a href="/admin/ldap"> <span
+												th:text="#{menuTreeLdapConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+					<div th:if="${collapseIn != 'system'}" id="collapseThree"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Feature-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'feature'}" class="warning">
+										<td><a href="/admin/feature"> <span
+												th:text="#{menuTreeFeatureConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'feature'}">
+										<td><a href="/admin/feature"> <span
+												th:text="#{menuTreeFeatureConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'environment'}" class="warning">
+										<td><a href="/admin/environment"> <span
+												th:text="#{menuTreeEnvironmentConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'environment'}">
+										<td><a href="/admin/environment"> <span
+												th:text="#{menuTreeEnvironmentConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'ldap'}" class="warning">
+										<td><a href="/admin/ldap"> <span
+												th:text="#{menuTreeLdapConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'ldap'}">
+										<td><a href="/admin/ldap"> <span
+												th:text="#{menuTreeLdapConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+							<a data-toggle="collapse" data-parent="#accordion"
+								href="#collapseFour"> <span
+								class="glyphicon glyphicon-hdd"> </span> <span
+								th:text="#{menuTreeRemoteSystem}"></span>
+							</a>
+						</h4>
+					</div>
+					<div th:if="${collapseIn == 'remotesystem'}" id="collapseFour"
+						class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Feature-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'remotesystem'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/remotesystem"> <span
+												th:text="#{menuTreeRemoteSystemConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotesystem'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/remotesystem"> <span
+												th:text="#{menuTreeRemoteSystemConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'remotelogin'}" class="warning">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotelogin'}">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+					<div th:if="${collapseIn != 'remotesystem'}" id="collapseFour"
+						class="panel-collapse collapse">
+						<div class="panel-body">
+							<table class="table">
+								<!-- Feature-Knoten -->
+								<div>
+									<tr th:if="${selectedItem == 'remotesystem'}" class="warning"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/remotesystem"> <span
+												th:text="#{menuTreeRemoteSystemConfig}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotesystem'}"
+										sec:authorize="hasAnyRole('SEC_SETUP_SYSTEM', 'SEC_ADMIN')">
+										<td><a href="/admin/remotesystem"> <span
+												th:text="#{menuTreeRemoteSystemConfig}"></span>
+										</a></td>
+									</tr>
+								</div>
+								<div>
+									<tr th:if="${selectedItem == 'remotelogin'}" class="warning">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+									<tr th:if="${selectedItem != 'remotelogin'}">
+										<td><a href="/admin/remotelogin"> <span
+												th:text="#{menuTreeRemoteLogin}"></span>
+										</a></td>
+									</tr>
+								</div>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="separator">
+			<div class="separator-content">
+				<a href="javascript:toggle_sub_menu_visibility();"> <img
+					th:src="@{'/icons/separator_clickable.png'}"></img>
+				</a>
+			</div>
+			<div id="separator-line"></div>
+		</div>
+	</div>
+</body>
+</html>

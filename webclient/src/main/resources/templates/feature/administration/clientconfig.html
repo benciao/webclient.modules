@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>MTS Web Client- Mandantenkonfiguration</title>
+
+<link th:href="@{/css/bootstrap.css}" rel="stylesheet" media="screen" />
+<link th:href="@{/css/bootstrap-theme.css}" rel="stylesheet"
+	media="screen" />
+<link th:href="@{/css/webclient.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-select.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-switch.css}" rel="stylesheet" />
+<link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
+
+<script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/bootstrap.js}"></script>
+<script th:src="@{/js/bootstrap-select.js}"></script>
+<script th:src="@{/js/bootstrap-treeview.js}"></script>
+<script th:src="@{/js/bootstrap-switch.js}"></script>
+<script th:src="@{/js/bootstrap-colorpicker.js}"></script>
+<script th:src="@{/js/webclient.js}"></script>
+
+<script type="text/javascript" th:inline="text">
+	/*<![CDATA[*/
+	$(document)
+			.ready(
+					function() {
+						$('#clientConfigAddRow')
+								.click(
+										function() {
+											var rowIndex = $(
+													'#clientTable tbody')
+													.children().length;
+											$('#clientTable tbody')
+													.append(
+															"<tr>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{clientConfigTableClient}]]' id='name-" + rowIndex + "' name='clients[" + rowIndex + "].name' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input class='form-control' placeholder='[[#{clientConfigTableDescription}]]' id='description-" + rowIndex + "' name='clients[" + rowIndex + "].description' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<div id='colorpicker-" + rowIndex + "' class='form-group colorpicker colorpicker-element' data-container='false'><div class='input-group-addon mts-colorpicker'><i></i></div><input type='hidden' id='hiddenColor-"+ rowIndex +"' name='clients[" + rowIndex + "].color' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "marndt, adock, <a href='#'>(3 weitere)</a>"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<input id='switch-" + rowIndex + "' type='checkbox' name='client-state-switch' data-size='mini' data-checked='false' data-on-color='success' data-off-color='warning'></input><input type='hidden' id='hiddenSwitch-" + rowIndex + "' name='clients[" + rowIndex + "].enabled' />"
+																	+ "</td>"
+																	+ "<td>"
+																	+ "<a href='#' class='a_delete' title='[[#{clientConfigActionDelete}]]' id='a_delete-"+ rowIndex +"''><span class='glyphicon glyphicon-remove'> </span></a><input type='hidden' id='hiddenRid-"+ rowIndex +"' name='clients["+ rowIndex +"].id' value='-1' /><input type='hidden' id='hiddenDelete-"+ rowIndex +"' name='clients[" + rowIndex + "].delete}' />"
+																	+ "</td>"
+																	+ "</tr>");
+
+											$('#colorpicker-' + rowIndex)
+													.colorpicker()
+													.on(
+															'changeColor.colorpicker',
+															function(event) {
+																var collectionIndex = event.target.id
+																		.split("-");
+																$(
+																		"#hiddenColor-"
+																				+ collectionIndex[1])
+																		.val(
+																				event.color
+																						.toHex());
+																$(
+																		"#clientConfigSave")
+																		.removeClass(
+																				"disabled");
+															});
+											$('#switch-' + rowIndex)
+													.bootstrapSwitch()
+													.on(
+															'switchChange.bootstrapSwitch',
+															function(event,
+																	state) {
+																var collectionIndex = event.target.id
+																		.split("-");
+																$(
+																		"#hiddenSwitch-"
+																				+ collectionIndex[1])
+																		.val(
+																				state);
+																$(
+																		"#clientConfigSave")
+																		.removeClass(
+																				"disabled");
+															});
+											$('#a_delete-' + rowIndex)
+													.click(
+															function(event) {
+																var collectionIndex = $(
+																		event.target)
+																		.parent()
+																		.attr(
+																				'id')
+																		.split(
+																				"-");
+
+																var row = $(
+																		event.target)
+																		.parent()
+																		.parent()
+																		.parent();
+
+																$(
+																		"#hiddenDelete-"
+																				+ collectionIndex[1])
+																		.val(
+																				true);
+
+																$(
+																		"#clientConfigSave")
+																		.removeClass(
+																				"disabled");
+
+																row.hide();
+															});
+
+											$("#hiddenSwitch-" + rowIndex).val(
+													false);
+											$("#clientConfigSave").removeClass(
+													"disabled");
+										});
+
+						$('.form-control').change(function() {
+							$("#clientConfigSave").removeClass("disabled");
+						});
+
+						$("[name='client-state-switch']").bootstrapSwitch().on(
+								'switchChange.bootstrapSwitch',
+								function(event, state) {
+									var collectionIndex = event.target.id
+											.split("-");
+									$("#hiddenSwitch-" + collectionIndex[1])
+											.val(state);
+									$("#clientConfigSave").removeClass(
+											"disabled");
+								});
+						$('.colorpicker').colorpicker().on(
+								'changeColor.colorpicker',
+								function(event) {
+									var collectionIndex = event.target.id
+											.split("-");
+									$("#hiddenColor-" + collectionIndex[1])
+											.val(event.color.toHex());
+									$("#clientConfigSave").removeClass(
+											"disabled");
+								});
+
+						$("#clientConfigSave").click(function() {
+							$("#clientConfigForm").submit();
+						});
+
+						$('.a_delete').click(
+								function(event) {
+									var collectionIndex = $(event.target)
+											.parent().attr('id').split("-");
+
+									var row = $(event.target).parent().parent()
+											.parent();
+
+									$("#hiddenDelete-" + collectionIndex[1])
+											.val(true);
+									$("#clientConfigSave").removeClass(
+											"disabled");
+
+									row.hide();
+								});
+
+					});
+	/*]]>*/
+</script>
+
+<style type="text/css">
+body {
+	padding-top: 127px;
+}
+</style>
+
+</head>
+<body>
+	<!-- {!begin layout} -->
+	<div th:include="layout :: header"></div>
+	<!-- {!end layout} -->
+
+	<div class="wrapper" id="wrapper">
+		<!-- div class="row"-->
+
+		<!-- {!begin navigation} -->
+		<div
+			th:include="feature/administration/adminmenu :: navigation('client', 'client')" id="navigation" class="navigation"></div>
+		<!-- {!end navigation} -->
+
+		<div id="content" class="content">
+			<nav class="navbar navbar-default navbar-top sub-nav">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<div class="navbar-brand navbar-text-submenu">
+							<span th:text="#{clientConfigTitle}"></span>
+						</div>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-right">
+							<button type="button" class="btn btn-ws btn-default navbar-btn"
+								id="clientConfigAddRow">
+								<span th:text="#{clientConfigActionNew}"></span>
+							</button>
+							<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+								id="clientConfigSave">
+								<span th:text="#{clientConfigActionSave}"></span>
+							</button>
+							<a class="glyph-link" href="/admin/client"><span
+								class="glyphicon glyphicon-refresh"></span></a>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class="container-fluid">
+
+				<form id="clientConfigForm" role="form"
+					th:action="@{/admin/client/save}" method="post"
+					th:object="${clientConfig}">
+
+					<div th:if="${#fields.hasErrors('*')}"
+						class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<strong><span th:text="#{clientConfigTableErrorMessage}"></span></strong>
+					</div>
+
+					<table class="table table-hover table-striped table-condensed"
+						id="clientTable">
+						<thead>
+							<tr>
+								<th><span th:text="#{clientConfigTableClient}"></span></th>
+								<th><span th:text="#{clientConfigTableDescription}"></span></th>
+								<th><span th:text="#{clientConfigTableColor}"></span></th>
+								<th><span th:text="#{clientConfigTableUser}"></span></th>
+								<th><span th:text="#{clientConfigTableStatus}"></span></th>
+								<th><span th:text="#{clientConfigTableActions}"></span></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="item, stat : *{clients}">
+								<td><input th:id="${'name-'+stat.index}" type="text"
+									class="form-control" placeholder="Name"
+									th:field="*{clients[__${stat.index}__].name}"
+									th:errorclass="field-tip" /><span class="tip-content"
+									th:errors="*{clients[__${stat.index}__].name}"></span></td>
+								<td><input th:id="${'description-'+stat.index}" type="text"
+									class="form-control" placeholder="Beschreibung"
+									th:field="*{clients[__${stat.index}__].description}"
+									th:errorclass="field-tip" /><span class="tip-content"
+									th:errors="*{clients[__${stat.index}__].description}"></span></td>
+								<td><div th:id="${'colorpicker-'+stat.index}"
+										class="form-group colorpicker" data-container="false"
+										th:attr="data-color=''+(*{clients[__${stat.index}__].color})">
+										<div class="input-group-addon mts-colorpicker">
+											<i></i>
+										</div>
+									</div> <input type="hidden" th:id="${'hiddenColor-'+stat.index}"
+									th:field="*{clients[__${stat.index}__].color}" /></td>
+								<td>marndt, adock, <a href="#">(3 weitere)</a></td>
+								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
+									name="client-state-switch" data-size="mini"
+									th:checked="*{clients[__${stat.index}__].enabled}"
+									data-on-color="success" data-off-color="warning"></input> <input
+									type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
+									th:field="*{clients[__${stat.index}__].enabled}" /></td>
+								<td><a class="a_delete" th:id="${'a_delete-'+stat.index}"
+									href="#" th:title="#{clientConfigActionDelete}"><span
+										class="glyphicon glyphicon-remove"> </span></a><input
+									type="hidden" th:id="${'hiddenRid-'+stat.index}"
+									th:field="*{clients[__${stat.index}__].id}" /><input
+									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
+									th:field="*{clients[__${stat.index}__].delete}" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<body>
+
+	<div th:fragment="header">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container-fluid custom-header">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="container-fluid">
+					<a href="/">
+						<div class="navbar-header">
+							<div class="navbar-brand">
+								<img alt="MTS Web Client" th:src="@{/icons/logo_32_white.png}" />
+							</div>
+							<p class="navbar-text">
+								MTS Web Client <span
+									th:if="${beans.applicationUtil.getSystemIdentifier()  != null}"
+									th:text="' - ' + ${beans.applicationUtil.getSystemIdentifier()}"></span>
+							</p>
+						</div>
+					</a>
+
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse"
+						id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav navbar-right">
+							<li><span class="label label-default"
+								th:style="'background-color: ' + ${beans.authenticationUtil.getSelectedClient().getColor()} + ' !important;'">
+									<label th:text="#{client}" />
+							</span></li>
+							<li class="space_right">
+								<form id="clientSelectForm"
+									th:action="@{${beans.authenticationUtil.getClientChangePath()}}"
+									method="POST">
+									<select id="clientSelect" class="selectpicker btn-ws select-xs"
+										th:name="selectedClient">
+										<option
+											th:each="client : ${beans.authenticationUtil.getClients()}"
+											th:value="${client.id}" th:text="${client.name}"
+											th:selected="${client.id == beans.authenticationUtil.getSelectedClient().getId()}">
+											<p th:text="${client.name}" />
+										</option>
+									</select>
+								</form>
+							</li>
+							<li><span class="label label-default"> <label
+									th:text="#{user}" />
+							</span>
+								<div class="btn-group">
+									<button type="button"
+										class="btn btn-default btn-xs dropdown-toggle"
+										data-toggle="dropdown" aria-expanded="false">
+										<span sec:authentication="name"></span> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu">
+										<li><a th:href="@{/logout}">
+												<p th:text="#{logout}" />
+										</a></li>
+										<li><a th:href="@{/switchLocale}">
+												<p th:text="#{switchLocale}" />
+										</a></li>
+									</ul>
+								</div></li>
+						</ul>
+					</div>
+					<!-- /.navbar-collapse -->
+				</div>
+				<div class="container-fluid custom-menu">
+					<div
+						th:attr="class='container-fluid ' + (${beans.applicationUtil.isMenuMinimized()} ? 'hide-menu' : '')"
+						id="maximizedMenu">
+						<div class="toggle-menu">
+							<a href="javascript:toggle_menu_visibility('maximizedMenu');">
+								<img alt="Menü ausblenden" th:src="@{/icons/menu_hide_grey.png}"></img>
+							</a>
+						</div>
+						<div class="menu">
+							<ul class="nav nav-pills">
+								<li
+									th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
+									role="presentation"
+									th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'active' : 'inactive') }">
+									<form th:attr="id=${feature.name}" th:action="@{'/admin'}"
+										method="POST">
+										<input type="hidden" th:name="currentFeature"
+											th:value="${feature.id}" />
+									</form> <a th:id="'link_' + ${feature.name}" class="feature-link">
+										<img th:src="@{${feature.iconPath}}"></img> <br></br>
+										<div th:text="#{${feature.i18nVariable}}" />
+								</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div
+						th:attr="class='container-fluid ' + (${beans.applicationUtil.isMenuMinimized()} ? '' : 'hide-menu')"
+						id="minimizedMenu">
+						<div class="toggle-menu">
+							<a href="javascript:toggle_menu_visibility('minimizedMenu');">
+								<img alt="Menü ausblenden" th:src="@{/icons/menu_show_grey.png}"></img>
+							</a>
+						</div>
+						<div class="menu">
+							<ul class="nav nav-pills">
+								<li
+									th:attr="class=${beans.authenticationUtil.getSelectedFeature() == null ? 'text-color-inactive' : (beans.authenticationUtil.getSelectedFeature().getName() == feature.name ? 'text-color-active' : 'text-color-inactive') }"
+									th:each="feature : ${beans.featureService.getAllFeatures(true, true)}"
+									role="presentation">
+									<form th:attr="id=${feature.name}" th:action="@{'/admin'}"
+										method="POST">
+										<input type="hidden" th:name="currentFeature"
+											th:value="${feature.id}" />
+									</form> <a th:id="'link_' + ${feature.name}" class="feature-link">
+										<div th:text="#{${feature.i18nVariable}}" />
+								</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.container-fluid -->
+		</nav>
+	</div>
+</body>
+
+</html>
