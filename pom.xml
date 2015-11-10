@@ -15,6 +15,7 @@
 	<modules>
 		<module>webclient</module>
 		<module>webclient.api</module>
+		<module>webclient.resources</module>
 		<module>webclient.feature.nomination</module>
 	</modules>
 	
@@ -39,6 +40,17 @@
 			<dependency>
 				<groupId>benciao.webclient</groupId>
 				<artifactId>webclient.api</artifactId>
+				<version>${project.version}</version>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.resources</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.resources</artifactId>
 				<version>${project.version}</version>
 				<classifier>sources</classifier>
 			</dependency>
