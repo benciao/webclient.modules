@@ -14,6 +14,10 @@
 			<artifactId>webclient.api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>benciao.webclient</groupId>
+			<artifactId>webclient.feature.nomination</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
