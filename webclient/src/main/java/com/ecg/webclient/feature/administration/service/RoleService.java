@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.autorisation.WebClientAccessRole;
 import com.ecg.webclient.feature.administration.persistence.mapper.RoleMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Role;
 import com.ecg.webclient.feature.administration.persistence.repo.FeatureRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.RoleRepository;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
+import com.ecg.webclient.feature.authorisation.WebClientAccessRole;
 
 /**
  * Service zum Bearbeiten von Benutzerrollen.

@@ -1,12 +1,12 @@
-package com.ecg.webclient.feature.nomination;
+package com.ecg.weblient.feature.nomination.setup;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.autorisation.WebClientAccessRole;
+import com.ecg.webclient.feature.authorisation.WebClientAccessRole;
 
 /**
- * Rolle, welche Konfigurieren des Gesamtsystems ermöglicht.
+ * Rolle, welche Zugriff auf Abwicklung erlaubt.
  *
  * @author arndtmar
  */
@@ -16,7 +16,7 @@ public class NominationAccessRole extends WebClientAccessRole
 	public static final String KEY = "NOMINATION";
 
 	@Autowired
-	public NominationAccessRole(FeatureNomination feature)
+	public NominationAccessRole(NominationFeature feature)
 	{
 		super(feature, KEY);
 	}

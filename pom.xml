@@ -14,6 +14,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<modules>
 		<module>webclient</module>
+		<module>webclient.api</module>
+		<module>webclient.feature.nomination</module>
 	</modules>
 	
 	<dependencyManagement>
@@ -26,6 +28,28 @@
 			<dependency>
 				<groupId>benciao.webclient</groupId>
 				<artifactId>webclient</artifactId>
+				<version>${project.version}</version>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.api</artifactId>
+				<version>${project.version}</version>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.feature.nomination</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.feature.nomination</artifactId>
 				<version>${project.version}</version>
 				<classifier>sources</classifier>
 			</dependency>

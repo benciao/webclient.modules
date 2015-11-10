@@ -2,7 +2,7 @@ package com.ecg.webclient.feature.administration.setup;
 
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.autorisation.WebClientFeature;
+import com.ecg.webclient.feature.authorisation.WebClientFeature;
 
 /**
  * Feature, welches das Administrieren des Gesamtsystems ermöglicht.

@@ -3,7 +3,7 @@ package com.ecg.webclient.feature.administration.setup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecg.webclient.feature.administration.autorisation.WebClientAccessRole;
+import com.ecg.webclient.feature.authorisation.WebClientAccessRole;
 
 /**
  * Rolle, welche das Administrieren der Benutzer- und Berechtigungsverwaltung ermöglicht.

@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AutoPopulatingList;
 
-import com.ecg.webclient.feature.administration.autorisation.WebClientFeature;
 import com.ecg.webclient.feature.administration.persistence.mapper.FeatureMapper;
 import com.ecg.webclient.feature.administration.persistence.modell.Feature;
 import com.ecg.webclient.feature.administration.persistence.repo.FeatureRepository;
 import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
+import com.ecg.webclient.feature.authorisation.WebClientFeature;
 
 /**
  * Service zum Bearbeiten von Features.
