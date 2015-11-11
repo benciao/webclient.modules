@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+	<body>
+		<div th:fragment="navigation(selectedItem,collapseIn)">
+
+			<div id="submenu" class="container navigation-submenu">
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">
+								<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+									<span class="glyphicon glyphicon-dashboard">
+									</span>
+									<span th:text="#{process.menuTreeDefinition}"></span>
+								</a>
+							</h4>
+						</div>
+						<div th:if="${collapseIn == 'definition'}" id="collapseOne"
+							class="panel-collapse collapse in">
+							<div class="panel-body">
+								<table class="table">
+									<!-- Definitions-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'definition'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{process.menuTreeDefinition}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'definition'}">
+											<td>
+												<a href="">
+													<span th:text="#{process.menuTreeDefinition}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+						<div th:if="${collapseIn != 'definition'}" id="collapseOne"
+							class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table">
+									<!-- Definitions-Knoten -->
+									<div>
+										<tr th:if="${selectedItem == 'definition'}" class="warning">
+											<td>
+												<a href="#">
+													<span th:text="#{process.menuTreeDefinition}"></span>
+												</a>
+											</td>
+										</tr>
+										<tr th:if="${selectedItem != 'definition'}">
+											<td>
+												<a href="">
+													<span th:text="#{process.menuTreeDefinition}"></span>
+												</a>
+											</td>
+										</tr>
+									</div>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div id="separator">
+				<div class="separator-content">
+					<a href="javascript:toggle_sub_menu_visibility();">
+						<img th:src="@{'/icons/separator_clickable.png'}"></img>
+					</a>
+				</div>
+				<div id="separator-line"></div>
+			</div>
+		</div>
+	</body>
+</html>

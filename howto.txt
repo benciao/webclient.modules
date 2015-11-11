@@ -1,16 +1,3 @@
-# Feature-Implementierung (Beispiel siehe webclient-Projekt)
- - neues web-Projekt erstellen mit Namen webclient.feature.[featurename] 
- - Projekt als Kindprojekt von webclient.modules anlegen
- - Implementierung in src/main/java unter dem Package com.ecg.webclient.feature.[featurename]
- - Thymeleaf-Templates in src/main/resources unter dem Ordner templates/feature/[featurename]
- - um ein Feature automatisch zu registrieren, Klasse erstellen, welche von WebClientFeature ableitet (dependency webclient.api einbinden) und mit @Component versehen
- - super-Konstruktor mit eindeutigem Schlüssel des Features (ACHTUNG GROßSCHREIBUNG) parametrisieren
-
-# Feature-Benennung
- - ...
 
 # Feature-Templates
  - eigenes Menü ...
- 
- # 1i18n
- - registrierung

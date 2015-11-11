@@ -17,6 +17,7 @@
 		<module>webclient.api</module>
 		<module>webclient.resources</module>
 		<module>webclient.feature.nomination</module>
+		<module>webclient.feature.process</module>
 	</modules>
 	
 	<dependencyManagement>
@@ -62,6 +63,17 @@
 			<dependency>
 				<groupId>benciao.webclient</groupId>
 				<artifactId>webclient.feature.nomination</artifactId>
+				<version>${project.version}</version>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.feature.process</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>benciao.webclient</groupId>
+				<artifactId>webclient.feature.process</artifactId>
 				<version>${project.version}</version>
 				<classifier>sources</classifier>
 			</dependency>
