@@ -13,7 +13,7 @@ import com.ecg.webclient.feature.authorisation.WebClientAccessRole;
 @Component
 public class NominationAccessRole extends WebClientAccessRole
 {
-	public static final String KEY = "NOMINATION";
+	public static final String KEY = "ADMIN";
 
 	@Autowired
 	public NominationAccessRole(NominationFeature feature)

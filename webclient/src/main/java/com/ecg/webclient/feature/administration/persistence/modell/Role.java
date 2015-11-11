@@ -1,6 +1,5 @@
 package com.ecg.webclient.feature.administration.persistence.modell;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,7 +21,6 @@ public class Role
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long	id;
-	@Column(unique = true)
 	private String	name;
 	@ManyToOne
 	@JoinColumn(name = "feature_id")
