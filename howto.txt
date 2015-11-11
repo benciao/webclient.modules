@@ -11,3 +11,6 @@
 
 # Feature-Templates
  - eigenes Menü ...
+ 
+ # 1i18n
+ - registrierung

@@ -193,8 +193,11 @@ public class AuthenticationUtil
     public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
     {
         this.selectedClient = selectedClient;
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        this.setNewAuthority();
+    }
+    
+    public void setNewAuthority()
+    {        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String login = auth.getName();
         String password = auth.getCredentials().toString();
 
