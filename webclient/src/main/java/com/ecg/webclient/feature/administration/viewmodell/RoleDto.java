@@ -50,6 +50,6 @@ public class RoleDto extends BaseObjectDto
 	
 	public String getCombinedName()
 	{
-		return this.getFeature().getName() + "_" + this.getName();
+		return "ROLE_" + this.getFeature().getName() + "_" + this.getName();
 	}
 }

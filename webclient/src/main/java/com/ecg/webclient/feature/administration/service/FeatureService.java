@@ -168,7 +168,7 @@ public class FeatureService
 
 		for (GrantedAuthority ga : auth.getAuthorities())
 		{
-			if (ga.getAuthority().startsWith(feature.getName()))
+			if (ga.getAuthority().startsWith("ROLE_" + feature.getName()))
 			{
 				return true;
 			}
