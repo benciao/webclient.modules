@@ -19,6 +19,6 @@ public interface AuditRepository extends CrudRepository<Audit, Long>
 	@Query("select COUNT(a) from Audit a where a.user.id = :userId and a.authenticationOk = :authenticationOk")
     public Integer countLoginAttemptsForUser(@Param("userId") Long userId, @Param("authenticationOk") boolean authenticationOk);
 	
-	@Query("select a.occurance from Audit a where a.user.id = :userId and a.authenticationOk = :authenticationOk")
-	public Iterable<Date> getLoginAttemptsTimeForUser(@Param("userId") Long userId, @Param("authenticationOk") boolean authenticationOk);
+    @Query("select a.occurance from Audit a where a.user.id = :userId")
+    public Iterable<Date> getLoginAttemptsTimeForUser(@Param("userId") Long userId);
 }
