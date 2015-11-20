@@ -52,7 +52,7 @@ public class MainController
     {
         authUtil.setSelectedClientWithNewAuthority(clientService.getClient(selectedClient));
         authUtil.setSelectedFeature(null);
-        return "/main";
+        return "main";
     }
 
     @RequestMapping(value = "/main/tooglemenue/true", method = RequestMethod.GET)
@@ -71,7 +71,7 @@ public class MainController
         ClientDto defaultClient = userService.getDefaultClientForUser(user);
         authUtil.setSelectedClient(defaultClient);
 
-        return "/main";
+        return "main";
     }
 
     @RequestMapping(value = "/main/tooglemenue/false", method = RequestMethod.GET)
@@ -92,6 +92,6 @@ public class MainController
             authUtil.getSessionLocaleResolver().setDefaultLocale(Locale.ENGLISH);
         }
 
-        return "/main";
+        return "main";
     }
 }
