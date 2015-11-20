@@ -1,8 +1,5 @@
 package com.ecg.webclient.feature.administration.authentication;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -90,8 +87,9 @@ public class AuthenticationUtil
 
         clients = new ArrayList<ClientDto>();
 
-        if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
-                || auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
+        if (auth.getAuthorities().contains(new DbGrantedAuthoritiy("ROLE_" + secAdminRole.getName()))
+                || auth.getAuthorities().contains(
+                        new DbGrantedAuthoritiy("ROLE_" + setupSystemRole.getName())))
         {
             clients = clientService.getAllClients(true);
         }
@@ -185,17 +183,6 @@ public class AuthenticationUtil
 
     }
 
-    public void setSelectedClient(ClientDto selectedClient)
-    {
-        this.selectedClient = selectedClient;
-    }
-
-    public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
-    {
-        this.selectedClient = selectedClient;
-        this.setNewAuthority();
-    }
-    
     public void setNewAuthority()
     {        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String login = auth.getName();
@@ -204,6 +191,17 @@ public class AuthenticationUtil
         UserDto user = userService.getUserByLogin(login);
 
         assignRolesToUserSession(user, auth, login, password);
+    }
+
+    public void setSelectedClient(ClientDto selectedClient)
+    {
+        this.selectedClient = selectedClient;
+    }
+    
+    public void setSelectedClientWithNewAuthority(ClientDto selectedClient)
+    {
+        this.selectedClient = selectedClient;
+        this.setNewAuthority();
     }
 
     public void setSelectedFeature(FeatureDto selectedFeature)
