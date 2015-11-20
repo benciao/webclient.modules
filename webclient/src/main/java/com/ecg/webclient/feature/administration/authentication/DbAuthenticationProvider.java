@@ -106,6 +106,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider
         catch (Exception ex)
         {
             auditService.logLoginAttempt(persistentUser, false);
+            throw ex;
         }
 
         return null;
