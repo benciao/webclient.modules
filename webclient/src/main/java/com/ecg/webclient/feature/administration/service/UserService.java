@@ -45,6 +45,7 @@ public class UserService
     static final String PROPERTY_NAME_INIT_USER_PASSWORD = "sec.init.user.pw";
 
     UserRepository      userRepo;
+    AuditService        auditService;
     GroupRepository     groupRepo;
     ClientRepository    clientRepo;
     ClientMapper        clientMapper;
@@ -56,7 +57,8 @@ public class UserService
     @Autowired
     public UserService(UserRepository userRepo, GroupRepository groupRepo, ClientRepository clientRepo,
             ClientMapper clientMapper, UserMapper userMapper, Environment env,
-            EnvironmentService environmentService, LdapConfigService ldapConfigService)
+            EnvironmentService environmentService, LdapConfigService ldapConfigService,
+            AuditService auditService)
     {
         this.userRepo = userRepo;
         this.groupRepo = groupRepo;
@@ -66,6 +68,7 @@ public class UserService
         this.env = env;
         this.environmentService = environmentService;
         this.ldapConfigService = ldapConfigService;
+        this.auditService = auditService;
     }
 
     /**
@@ -74,6 +77,7 @@ public class UserService
      * @param detachedUsers
      *            Liste von zu löschenden Benutzern
      */
+    @Transactional
     public void deleteUsers(List<UserDto> detachedUsers)
     {
         try
@@ -84,6 +88,7 @@ public class UserService
 
                 if (persistentUser != null)
                 {
+                    auditService.deleteForUser(persistentUser.getId());
                     userRepo.delete(persistentUser);
                 }
             }

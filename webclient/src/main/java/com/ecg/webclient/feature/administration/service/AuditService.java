@@ -64,6 +64,24 @@ public class AuditService
     }
 
     /**
+     * Löscht alle Auditeinträge eines Benutzers.
+     * 
+     * @param userId
+     *            Id des Benutzers
+     */
+    public void deleteForUser(long userId)
+    {
+        try
+        {
+            auditRepo.deleteForUser(userId);
+        }
+        catch (Exception ex)
+        {
+            logger.error(ex);
+        }
+    }
+
+    /**
      * @param user
      *            Benutzer
      * @return Zeiten der Anmeldeversuche
