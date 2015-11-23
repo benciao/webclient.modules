@@ -1,5 +1,8 @@
 package com.ecg.webclient.feature.administration.authentication;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -218,8 +221,9 @@ public class AuthenticationUtil
         {
             // Nutzer mit dieser Rolle erhält alle ihm zugeordneten Rollen über
             // alle Mandanten
-            if (auth.getAuthorities().contains(new DbGrantedAuthoritiy(secAdminRole.getName()))
-                    || auth.getAuthorities().contains(new DbGrantedAuthoritiy(setupSystemRole.getName())))
+            if (auth.getAuthorities().contains(new DbGrantedAuthoritiy("ROLE_" + secAdminRole.getName()))
+                    || auth.getAuthorities().contains(
+                            new DbGrantedAuthoritiy("ROLE_" + setupSystemRole.getName())))
             {
                 for (RoleDto role : roleService.getEnabledRolesWithEnabledFeatureForIds(group
                         .getRoleIdObjects()))
