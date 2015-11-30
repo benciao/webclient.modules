@@ -55,7 +55,7 @@ public class WebClientAuthenticationSuccessHandler implements AuthenticationSucc
             String password = auth.getCredentials().toString();
             auth.getAuthorities().forEach(e -> grantedAuths.add(e));
 
-            grantedAuths.add(new DbGrantedAuthoritiy("SEC_FORCE_CHANGE_PASSWORD"));
+            grantedAuths.add(new DbGrantedAuthoritiy("ROLE_SEC_FORCE_CHANGE_PASSWORD"));
 
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(login, password, grantedAuths));

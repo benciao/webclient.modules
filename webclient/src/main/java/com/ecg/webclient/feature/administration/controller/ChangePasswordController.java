@@ -35,7 +35,7 @@ public class ChangePasswordController
      * 
      * @return Template
      */
-    @PreAuthorize("hasRole('SEC_FORCE_CHANGE_PASSWORD')")
+    @PreAuthorize("hasRole('ROLE_SEC_FORCE_CHANGE_PASSWORD')")
     @RequestMapping(method = RequestMethod.POST)
     public String changePassword(@ModelAttribute NewPassword newPassword, Model model)
     {
