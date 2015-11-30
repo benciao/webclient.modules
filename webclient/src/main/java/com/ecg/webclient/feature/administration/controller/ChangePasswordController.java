@@ -40,7 +40,7 @@ public class ChangePasswordController
     public String changePassword(@ModelAttribute NewPassword newPassword, Model model)
     {
         authUtil.changeUserPassword(newPassword.getPw());
-        return "/main";
+        return "main";
     }
 
     /**
