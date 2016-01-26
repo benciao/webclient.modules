@@ -17,9 +17,16 @@ a {
 	line-height: 20px;
 }
 
-.navbar-text {
+.navbar-custom-title {
+	margin-left: 15px;
 	color: #FFFFFF !important;
 	font-size: 20px;
+}
+
+.navbar-nav > li > a {
+    line-height: 20px;
+    height: 20px;
+    padding-top: 0px;
 }
 
 .navbar-text-submenu {
