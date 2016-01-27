@@ -23,10 +23,10 @@ a {
 	font-size: 20px;
 }
 
-.navbar-nav > li > a {
-    line-height: 20px;
-    height: 20px;
-    padding-top: 0px;
+.navbar-nav>li>a {
+	line-height: 20px;
+	height: 20px;
+	padding-top: 0px;
 }
 
 .navbar-text-submenu {

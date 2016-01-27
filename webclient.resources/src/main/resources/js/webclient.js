@@ -95,41 +95,60 @@ function validatePassword() {
 	return pw == confirmedPw;
 }
 
-$(document).ready(function() {
+$(document).ready(
+		function() {
+			$("a").mousedown(function(e) {
+				var element = e.target;
+				var link = $(element).parent(".feature-link");
+				var featureLinkId = $(link).attr('id');
 
-	$("#clientSelect").change(function() {
-		$("#clientSelectForm").submit();
-	});
-	
-	$("a").mousedown(function (e) { 
-		var element = e.target;
-		var link = $(element).parent(".feature-link");
-		var featureLinkId = $(link).attr('id');
-		
-		var collectionIndex = featureLinkId.split("_");
-		var featureName = collectionIndex[1];
-		
-		if( (e.which == 2) ) {
-			$("#" + featureName).attr('target', '_blank');
-	   }	   
-	   
-	   document.getElementById(featureName).submit();
-	   e.preventDefault();
-	});
+				var collectionIndex = featureLinkId.split("_");
+				var featureName = collectionIndex[1];
 
-	var classContent = $('#minimizedMenu').attr('class');
-	if (classContent.indexOf("hide-menu") > -1) {
-		var contentWrapperDiv = document.getElementById('wrapper');
-		if (contentWrapperDiv != null) {
-			contentWrapperDiv.style.top = '130px';
-		}
-	} else {
-		var contentWrapperDiv = document.getElementById('wrapper');
-		if (contentWrapperDiv != null) {
-			contentWrapperDiv.style.top = '105px';
-		}
-	}
-});
+				if ((e.which == 2)) {
+					$("#" + featureName).attr('target', '_blank');
+				}
+
+				document.getElementById(featureName).submit();
+				e.preventDefault();
+			});
+
+			var classContent = $('#minimizedMenu').attr('class');
+			if (classContent.indexOf("hide-menu") > -1) {
+				var contentWrapperDiv = document.getElementById('wrapper');
+				if (contentWrapperDiv != null) {
+					contentWrapperDiv.style.top = '130px';
+				}
+			} else {
+				var contentWrapperDiv = document.getElementById('wrapper');
+				if (contentWrapperDiv != null) {
+					contentWrapperDiv.style.top = '105px';
+				}
+			}
+
+			$('.dropdown-select').on(
+					'click',
+					'.dropdown-menu li a',
+					function() {
+						var target = $(this).html();
+
+						// Adds active class to selected item
+						$(this).parents('.dropdown-menu').find('li')
+								.removeClass('active');
+						$(this).parent('li').addClass('active');
+
+						// Displays selected text on dropdown-toggle button
+						$(this).parents('.dropdown-select').find(
+								'.dropdown-toggle').html(
+								target + ' <span class="caret"></span>');
+
+						var clientId = $(this).find("span.client-info").attr(
+								'value');
+
+						$("#hiddenSelectedClient").val(clientId);
+						$("#clientSelectForm").submit();
+					});
+		});
 
 function encode(value) {
 	return $.md5(value);
