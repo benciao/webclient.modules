@@ -243,6 +243,10 @@
 						$('.a_edit').click(function(event) {
 							onEditClick(event);
 						});
+						
+						$('.a_copy').click(function(event) {
+							onCopyClick(event);
+						});
 
 						$('#buttonRoleAssignmentDone').click(function(event) {
 
@@ -264,6 +268,37 @@
 		return false;
 	}
 
+	function onCopyClick(event) {
+		var collectionIndex = $(event.target).parent().attr('id').split("-");
+
+		var groupName = $("#name-" + collectionIndex[1]).val();
+
+		var assignedRoleRids = $("#hiddenRoleRids-" + collectionIndex[1]).val();
+
+		// Headertext setzen
+		$("#roleCopyPanelHeadingName").text(" " + groupName);
+
+		// GruppenId an allen Rollen setzen (notwendig wegen onChange Event an Switches)
+		$("tr.roleItem").each(function() {
+			$(this).find("input.hiddenGroupRid").val(collectionIndex[1]);
+		});
+
+		// bereits zugeordnete Rollen initialisieren
+		$("tr.roleItem").each(
+				function() {
+					var roleRid = $(this).find("input.hiddenRoleRid").val();
+
+					$(this).find("input.roleSwitch").bootstrapSwitch('state',
+							isRoleAssigned(roleRid, assignedRoleRids));
+
+				});
+
+		$("#roleCopyPanel").modal('show');
+
+		var row = $(event.target).parent().parent().parent();
+		row.addClass('highlight').siblings().removeClass('highlight');
+	}
+	
 	function onEditClick(event) {
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
 
@@ -394,7 +429,10 @@ body {
 								</a> <a class="a_edit" th:id="${'a_edit-'+stat.index}" href="#"
 									th:title="#{groupsActionEdit}"> <span
 										class="glyphicon glyphicon-edit"> </span>
-								</a> <input type="hidden" th:id="${'hiddenRid-'+stat.index}"
+								</a> <a class="a_copy" th:id="${'a_copy-'+stat.index}" href="#"
+									th:title="#{groupsActionCopy}"> <span
+										class="glyphicon glyphicon-share"> </span>
+								</a><input type="hidden" th:id="${'hiddenRid-'+stat.index}"
 									th:field="*{groups[__${stat.index}__].id}" /> <input
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
 									th:field="*{groups[__${stat.index}__].delete}" /> <input
@@ -413,6 +451,59 @@ body {
 									<h5 class="modal-title">
 										<span th:text="#{groupRoleAssignmentHeader}"></span> <span
 											id="roleEditPanelHeadingName"></span>
+									</h5>
+								</div>
+								<div class="modal-body">
+									<table class="table table-hover table-striped table-condensed"
+										id="roleTable">
+										<thead>
+											<tr>
+												<th><span th:text="#{rolesTableName}"></span></th>
+												<th><span th:text="#{rolesTableDescription}"></span></th>
+												<th><span th:text="#{roleAssigned}"></span></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="roleItem" th:each="item, stat : *{roles}">
+												<td><span th:text="*{roles[__${stat.index}__].name}"></span>
+												</td>
+												<td><span
+													th:text="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}"></span>
+												</td>
+												<td><input class="roleSwitch"
+													th:id="${'role-switch-'+stat.index}" type="checkbox"
+													name="role-assignment-switch" data-size="mini"
+													data-on-color="success" data-off-color="warning"></input> <input
+													class="hiddenRoleSwitchValue" type="hidden"
+													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
+													value="false" /> <input class="hiddenRoleRid"
+													th:id="${'hiddenRoleRid-'+stat.index}" type="hidden"
+													th:field="*{roles[__${stat.index}__].id}" /> <input
+													class="hiddenGroupRid"
+													th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
+													value="" /></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div class="modal-footer">
+									<button id="buttonRoleAssignmentDone" type="button"
+										class="btn btn-ws btn-primary btn-don" data-dismiss="modal">
+										<span th:text="#{buttonDone}"></span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Modal -->
+					<div id="roleCopyPanel" class="modal modal-dock-to-navigation">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title">
+										<span th:text="#{groupCopyHeader}"></span> <span
+											id="roleCopyPanelHeadingName"></span>
 									</h5>
 								</div>
 								<div class="modal-body">
