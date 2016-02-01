@@ -260,6 +260,37 @@ public class GroupService
 	}
 
 	/**
+     * Speichert eine Gruppe.
+     * 
+     * @param detachedGroup
+     *            Zu speichernde Gruppe
+     * @return Gespeicherte Gruppe
+     */
+    public GroupDto saveGroup(GroupDto detachedGroup)
+    {
+        try
+        {
+            Group draftGroup = groupMapper.mapToEntity(detachedGroup);
+            Group persistedGroup = groupRepo.save(draftGroup);
+
+            if (persistedGroup != null)
+            {
+                return groupMapper.mapToDto(persistedGroup);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (final Exception e)
+        {
+            logger.error(e);
+        }
+
+        return null;
+    }
+
+	/**
 	 * Speichert eine Gruppe.
 	 * 
 	 * @param detachedGroup
@@ -295,7 +326,7 @@ public class GroupService
 		return null;
 	}
 
-	/**
+    /**
 	 * Speichert eine Liste von Gruppen.
 	 * 
 	 * @param detachedGroups
