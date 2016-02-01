@@ -25,7 +25,9 @@ import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
 import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
+import com.ecg.webclient.feature.administration.viewmodell.GroupCopyConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
+import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 
 /**
@@ -103,11 +105,19 @@ public class GroupController
 	@RequestMapping(method = RequestMethod.GET)
 	public String showGroupConfig(Model model)
 	{
+        List<RoleDto> roles = roleService.getAllRoles(false);
+
 		GroupConfig groupConfig = new GroupConfig();
 		groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
-		groupConfig.setRoles(roleService.getAllRoles(false));
+        groupConfig.setRoles(roles);
 		groupConfig.setClientId(authUtil.getSelectedClient().getId());
 		model.addAttribute("groupConfig", groupConfig);
+
+        GroupCopyConfig groupCopyConfig = new GroupCopyConfig();
+        groupCopyConfig.setCopyGroup(new GroupDto());
+        groupCopyConfig.setRoles(roles);
+        groupCopyConfig.setClientId(authUtil.getSelectedClient().getId());
+        model.addAttribute("groupCopyConfig", groupCopyConfig);
 
 		return getLoadingRedirectTemplate();
 	}

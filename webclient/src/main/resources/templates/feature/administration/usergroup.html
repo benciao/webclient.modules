@@ -17,6 +17,8 @@
 <link th:href="@{/css/bootstrap-colorpicker.css}" rel="stylesheet" />
 
 <script th:src="@{/js/jquery.js}"></script>
+<script th:src="@{/js/jquery.validate.js}"></script>
+<script th:src="@{/js/additional-methods.js}"></script>
 <script th:src="@{/js/bootstrap.js}"></script>
 <script th:src="@{/js/bootstrap-select.js}"></script>
 <script th:src="@{/js/bootstrap-treeview.js}"></script>
@@ -29,6 +31,31 @@
 	$(document)
 			.ready(
 					function() {
+						
+						$('#test-form').validate({
+						    rules: {
+						      namecopy: {
+						        minlength: 2,
+						        required: true
+						      },
+						      email: {
+						        required: true,
+						        email: true
+						      },
+						      message: {
+						        minlength: 2,
+						        required: true
+						      }
+						    },
+						    highlight: function(element) {
+						      $(element).closest('.control-group').removeClass('success').addClass('error');
+						    },
+						    success: function(element) {
+						      element.text('OK!').addClass('valid')
+						        .closest('.control-group').removeClass('error').addClass('success');
+						    }
+						  });
+						
 						$('#groupsAddRow')
 								.click(
 										function() {
@@ -138,6 +165,12 @@
 									$("#groupsSave").removeClass("disabled");
 								});
 
+						$("[name='group-copy-state-switch']").bootstrapSwitch()
+								.on('switchChange.bootstrapSwitch',
+										function(event, state) {
+											$("#hiddenSwitch-copy").val(state);
+										});
+
 						$('.form-control').change(function() {
 							$("#groupsSave").removeClass("disabled");
 						});
@@ -173,7 +206,8 @@
 													.text();
 
 											if (" " + groupName == roleEditPanel) {
-												$("#roleEditPanel").modal('hide');
+												$("#roleEditPanel").modal(
+														'hide');
 											}
 
 											row.hide();
@@ -243,9 +277,14 @@
 						$('.a_edit').click(function(event) {
 							onEditClick(event);
 						});
-						
+
 						$('.a_copy').click(function(event) {
 							onCopyClick(event);
+						});
+						
+						$('#buttonGroupCopySave').click(function() {
+
+							$("#test-form").submit();
 						});
 
 						$('#buttonRoleAssignmentDone').click(function(event) {
@@ -278,13 +317,8 @@
 		// Headertext setzen
 		$("#roleCopyPanelHeadingName").text(" " + groupName);
 
-		// GruppenId an allen Rollen setzen (notwendig wegen onChange Event an Switches)
-		$("tr.roleItem").each(function() {
-			$(this).find("input.hiddenGroupRid").val(collectionIndex[1]);
-		});
-
 		// bereits zugeordnete Rollen initialisieren
-		$("tr.roleItem").each(
+		$("tr.roleItemCopy").each(
 				function() {
 					var roleRid = $(this).find("input.hiddenRoleRid").val();
 
@@ -298,7 +332,7 @@
 		var row = $(event.target).parent().parent().parent();
 		row.addClass('highlight').siblings().removeClass('highlight');
 	}
-	
+
 	function onEditClick(event) {
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
 
@@ -368,7 +402,8 @@ body {
 								id="groupsAddRow">
 								<span th:text="#{groupsActionNew}"></span>
 							</button>
-							<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+							<button type="button"
+								class="btn btn-ws btn-default navbar-btn disabled"
 								id="groupsSave">
 								<span th:text="#{rolesActionSave}"></span>
 							</button>
@@ -495,7 +530,10 @@ body {
 							</div>
 						</div>
 					</div>
-					
+				</form>
+				<form id="test-form"
+					th:action="@{/admin/usergroup/copy}" method="post"
+					th:object="${groupCopyConfig}">
 					<!-- Modal -->
 					<div id="roleCopyPanel" class="modal modal-dock-to-navigation">
 						<div class="modal-dialog modal-lg">
@@ -508,6 +546,47 @@ body {
 								</div>
 								<div class="modal-body">
 									<table class="table table-hover table-striped table-condensed"
+										id="groupCopyAttributesTable">
+										<thead>
+											<tr>
+												<th><span th:text="#{groupsTableName}"></span></th>
+												<th><span th:text="#{groupsTableDescription}"></span></th>
+												<th><span th:text="#{groupsTableStatus}"></span></th>
+												<th><span th:text="#{groupsTableClientSelect}"></span></th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td class="control-group"><input id="namecopy"
+													name="namecopy" type="text" class="form-control"
+													placeholder="Name" th:field="*{copyGroup.name}"
+													th:errorclass="field-tip" /> <span class="tip-content"
+													th:errors="*{copyGroup.name}"></span></td>
+												<td class="control-group"><input id="description-copy"
+													type="text" class="form-control" placeholder="Beschreibung"
+													th:field="*{copyGroup.description}"
+													th:errorclass="field-tip" /> <span class="tip-content"
+													th:errors="*{copyGroup.description}"></span></td>
+												<td><input id="switch-copy" type="checkbox"
+													name="group-copy-state-switch" data-size="mini"
+													th:checked="*{copyGroup.enabled}" data-on-color="success"
+													data-off-color="warning" /> <input type="hidden"
+													id="hiddenSwitch-copy" th:field="*{copyGroup.enabled}" /></td>
+												<td><select id="client-copy" class="form-control"
+													th:field="*{copyGroup.client}">
+														<option
+															th:each="client : ${beans.authenticationUtil.getClients()}"
+															th:field="*{copyGroup.client}" th:value="${client.id}"
+															th:text="${client.name}"></option>
+												</select></td>
+												<td><input type="hidden" id="hiddenRid-copy"
+													th:field="*{copyGroup.id}" /> <input type="hidden"
+													id="hiddenRoleRids-copy" th:field="*{copyGroup.roleIds}" /></td>
+											</tr>
+										</tbody>
+									</table>
+
+									<table class="table table-hover table-striped table-condensed"
 										id="roleTable">
 										<thead>
 											<tr>
@@ -517,7 +596,7 @@ body {
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="roleItem" th:each="item, stat : *{roles}">
+											<tr class="roleItemCopy" th:each="item, stat : *{roles}">
 												<td><span th:text="*{roles[__${stat.index}__].name}"></span>
 												</td>
 												<td><span
@@ -531,18 +610,19 @@ body {
 													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
 													value="false" /> <input class="hiddenRoleRid"
 													th:id="${'hiddenRoleRid-'+stat.index}" type="hidden"
-													th:field="*{roles[__${stat.index}__].id}" /> <input
-													class="hiddenGroupRid"
-													th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
-													value="" /></td>
+													th:field="*{roles[__${stat.index}__].id}" /></td>
 											</tr>
 										</tbody>
 									</table>
 								</div>
 								<div class="modal-footer">
-									<button id="buttonRoleAssignmentDone" type="button"
+									<button id="buttonGroupCopyCancel" type="button"
 										class="btn btn-ws btn-primary btn-don" data-dismiss="modal">
-										<span th:text="#{buttonDone}"></span>
+										<span th:text="#{buttonCancel}"></span>
+									</button>
+									<button id="buttonGroupCopySave" type="button"
+										class="btn btn-ws btn-primary btn-don">
+										<span th:text="#{buttonCopy}"></span>
 									</button>
 								</div>
 							</div>

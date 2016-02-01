@@ -1,0 +1,7 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://pn-ecg-72956.vngag.de:8761/eureka/
+spring:
+  application:
+    name: Webclient-Service

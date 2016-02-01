@@ -102,15 +102,17 @@ $(document).ready(
 				var link = $(element).parent(".feature-link");
 				var featureLinkId = $(link).attr('id');
 
-				var collectionIndex = featureLinkId.split("_");
-				var featureName = collectionIndex[1];
+				if (typeof featureLinkId != 'undefined') {
+					var collectionIndex = featureLinkId.split("_");
+					var featureName = collectionIndex[1];
 
-				if ((e.which == 2)) {
-					$("#" + featureName).attr('target', '_blank');
+					if ((e.which == 2)) {
+						$("#" + featureName).attr('target', '_blank');
+					}
+
+					document.getElementById(featureName).submit();
+					e.preventDefault();
 				}
-
-				document.getElementById(featureName).submit();
-				e.preventDefault();
 			});
 
 			var classContent = $('#minimizedMenu').attr('class');
