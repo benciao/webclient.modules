@@ -31,31 +31,36 @@
 	$(document)
 			.ready(
 					function() {
-						
-						$('#test-form').validate({
-						    rules: {
-						      namecopy: {
-						        minlength: 2,
-						        required: true
-						      },
-						      email: {
-						        required: true,
-						        email: true
-						      },
-						      message: {
-						        minlength: 2,
-						        required: true
-						      }
-						    },
-						    highlight: function(element) {
-						      $(element).closest('.control-group').removeClass('success').addClass('error');
-						    },
-						    success: function(element) {
-						      element.text('OK!').addClass('valid')
-						        .closest('.control-group').removeClass('error').addClass('success');
-						    }
-						  });
-						
+
+						$('#test-form').validate(
+								{
+									rules : {
+										namecopy : {
+											minlength : 2,
+											required : true
+										},
+										email : {
+											required : true,
+											email : true
+										},
+										message : {
+											minlength : 2,
+											required : true
+										}
+									},
+									highlight : function(element) {
+										$(element).closest('.control-group')
+												.removeClass('success')
+												.addClass('error');
+									},
+									success : function(element) {
+										element.text('OK!').addClass('valid')
+												.closest('.control-group')
+												.removeClass('error').addClass(
+														'success');
+									}
+								});
+
 						$('#groupsAddRow')
 								.click(
 										function() {
@@ -176,6 +181,7 @@
 						});
 
 						$("#groupsSave").click(function() {
+							$("#hiddenDoCopy").val(false);
 							$("#groupsForm").submit();
 						});
 
@@ -281,10 +287,11 @@
 						$('.a_copy').click(function(event) {
 							onCopyClick(event);
 						});
-						
+
 						$('#buttonGroupCopySave').click(function() {
 
-							$("#test-form").submit();
+							$("#hiddenDoCopy").val(true);
+							$("#groupsForm").submit();
 						});
 
 						$('#buttonRoleAssignmentDone').click(function(event) {
@@ -530,10 +537,6 @@ body {
 							</div>
 						</div>
 					</div>
-				</form>
-				<form id="test-form"
-					th:action="@{/admin/usergroup/copy}" method="post"
-					th:object="${groupCopyConfig}">
 					<!-- Modal -->
 					<div id="roleCopyPanel" class="modal modal-dock-to-navigation">
 						<div class="modal-dialog modal-lg">
@@ -581,7 +584,8 @@ body {
 												</select></td>
 												<td><input type="hidden" id="hiddenRid-copy"
 													th:field="*{copyGroup.id}" /> <input type="hidden"
-													id="hiddenRoleRids-copy" th:field="*{copyGroup.roleIds}" /></td>
+													id="hiddenRoleRids-copy" th:field="*{copyGroup.roleIds}" />
+													<input type="hidden" id="hiddenDoCopy" th:field="*{doCopy}" /></td>
 											</tr>
 										</tbody>
 									</table>

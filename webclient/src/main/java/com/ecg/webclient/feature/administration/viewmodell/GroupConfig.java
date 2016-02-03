@@ -9,59 +9,81 @@ import org.springframework.util.AutoPopulatingList;
 
 public class GroupConfig
 {
-	@Valid
-	private List<GroupDto>	groups;
-	private List<RoleDto>	roles;
-	private long			clientId;
+    @Valid
+    private List<GroupDto> groups;
+    private List<RoleDto>  roles;
+    private GroupDto       copyGroup;
+    private long           clientId;
+    private boolean        doCopy = false;
 
-	public List<GroupDto> getGroups()
-	{
-		if (groups == null)
-		{
-			groups = new AutoPopulatingList<GroupDto>(GroupDto.class);
-		}
-		return groups;
-	}
+    public long getClientId()
+    {
+        return clientId;
+    }
 
-	public List<RoleDto> getRoles()
-	{
-		if (roles == null)
-		{
-			roles = new ArrayList<RoleDto>();
-		}
-		return roles;
-	}
+    public GroupDto getCopyGroup()
+    {
+        return copyGroup;
+    }
 
-	public void removeDeleted()
-	{
-		List<GroupDto> groupsToRemove = new ArrayList<GroupDto>();
-		for (GroupDto group : groups)
-		{
-			if (group.isDelete())
-			{
-				groupsToRemove.add(group);
-			}
-		}
-		groups.removeAll(groupsToRemove);
-	}
+    public List<GroupDto> getGroups()
+    {
+        if (groups == null)
+        {
+            groups = new AutoPopulatingList<GroupDto>(GroupDto.class);
+        }
+        return groups;
+    }
 
-	public void setGroups(List<GroupDto> groups)
-	{
-		this.groups = groups;
-	}
+    public List<RoleDto> getRoles()
+    {
+        if (roles == null)
+        {
+            roles = new ArrayList<RoleDto>();
+        }
+        return roles;
+    }
 
-	public void setRoles(List<RoleDto> roles)
-	{
-		this.roles = roles;
-	}
+    public boolean isDoCopy()
+    {
+        return doCopy;
+    }
 
-	public long getClientId()
-	{
-		return clientId;
-	}
+    public void removeDeleted()
+    {
+        List<GroupDto> groupsToRemove = new ArrayList<GroupDto>();
+        for (GroupDto group : groups)
+        {
+            if (group.isDelete())
+            {
+                groupsToRemove.add(group);
+            }
+        }
+        groups.removeAll(groupsToRemove);
+    }
 
-	public void setClientId(long clientId)
-	{
-		this.clientId = clientId;
-	}
+    public void setClientId(long clientId)
+    {
+        this.clientId = clientId;
+    }
+
+    public void setCopyGroup(GroupDto group)
+    {
+        this.copyGroup = group;
+    }
+
+    public void setDoCopy(boolean doCopy)
+    {
+        this.doCopy = doCopy;
+    }
+
+    public void setGroups(List<GroupDto> groups)
+    {
+        this.groups = groups;
+    }
+
+    public void setRoles(List<RoleDto> roles)
+    {
+        this.roles = roles;
+    }
 }

@@ -25,10 +25,8 @@ import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
 import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
-import com.ecg.webclient.feature.administration.viewmodell.GroupCopyConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
-import com.ecg.webclient.feature.administration.viewmodell.validator.CopyGroupDtoValidator;
 import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 
 /**
@@ -52,8 +50,6 @@ public class GroupController
     private AuthenticationUtil authUtil;
     @Autowired
     GroupDtoValidator          groupDtoValidator;
-    @Autowired
-    CopyGroupDtoValidator      copyGroupDtoValidator;
 
     /**
      * Behandelt POST-Requests vom Typ "/admin/usergroup/copy". Kopiert eine Benutzergruppe.
@@ -63,14 +59,14 @@ public class GroupController
     @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
             + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
     @RequestMapping(value = "/copy", method = RequestMethod.POST)
-    public String copyGroup(@Valid GroupCopyConfig groupCopyConfig, BindingResult bindingResult)
+    public String copyGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
     {
         if (bindingResult.hasErrors())
         {
             return getLoadingRedirectTemplate();
         }
 
-        GroupDto copyGroup = groupCopyConfig.getCopyGroup();
+        GroupDto copyGroup = groupConfig.getCopyGroup();
         groupService.saveGroup(copyGroup);
 
         return "redirect:";
@@ -132,13 +128,8 @@ public class GroupController
         groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
         groupConfig.setRoles(roles);
         groupConfig.setClientId(authUtil.getSelectedClient().getId());
+        groupConfig.setCopyGroup(new GroupDto());
         model.addAttribute("groupConfig", groupConfig);
-
-        GroupCopyConfig groupCopyConfig = new GroupCopyConfig();
-        groupCopyConfig.setCopyGroup(new GroupDto());
-        groupCopyConfig.setRoles(roles);
-        groupCopyConfig.setClientId(authUtil.getSelectedClient().getId());
-        model.addAttribute("groupCopyConfig", groupCopyConfig);
 
         return getLoadingRedirectTemplate();
     }
@@ -152,11 +143,5 @@ public class GroupController
     protected void initGroupBinder(WebDataBinder binder)
     {
         binder.setValidator(groupDtoValidator);
-    }
-
-    @InitBinder("groupCopyConfig")
-    protected void initGroupCopyBinder(WebDataBinder binder)
-    {
-        binder.setValidator(copyGroupDtoValidator);
     }
 }
