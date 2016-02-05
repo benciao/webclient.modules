@@ -17,6 +17,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
 import com.ecg.webclient.feature.administration.service.GroupService;
@@ -38,6 +39,7 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoVal
 @Scope("request")
 @Controller
 @RequestMapping(value = "/admin/usergroup")
+@SessionAttributes("groupConfig")
 public class GroupController
 {
     static final Logger        logger = LogManager.getLogger(GroupController.class.getName());

@@ -12,9 +12,11 @@ public class GroupConfig
     @Valid
     private List<GroupDto> groups;
     private List<RoleDto>  roles;
+    @Valid
     private GroupDto       copyGroup;
     private long           clientId;
     private boolean        doCopy = false;
+    private Long           groupToCopyId;
 
     public long getClientId()
     {
@@ -33,6 +35,11 @@ public class GroupConfig
             groups = new AutoPopulatingList<GroupDto>(GroupDto.class);
         }
         return groups;
+    }
+
+    public Long getGroupToCopyId()
+    {
+        return groupToCopyId;
     }
 
     public List<RoleDto> getRoles()
@@ -80,6 +87,11 @@ public class GroupConfig
     public void setGroups(List<GroupDto> groups)
     {
         this.groups = groups;
+    }
+
+    public void setGroupToCopyId(Long groupToCopyId)
+    {
+        this.groupToCopyId = groupToCopyId;
     }
 
     public void setRoles(List<RoleDto> roles)

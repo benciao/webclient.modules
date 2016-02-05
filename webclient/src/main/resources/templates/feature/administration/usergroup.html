@@ -26,41 +26,11 @@
 <script th:src="@{/js/bootstrap-colorpicker.js}"></script>
 <script th:src="@{/js/webclient.js}"></script>
 
-<script type="text/javascript" th:inline="text">
+<script type="text/javascript" th:inline="javascript">
 	/*<![CDATA[*/
 	$(document)
 			.ready(
 					function() {
-
-						$('#test-form').validate(
-								{
-									rules : {
-										namecopy : {
-											minlength : 2,
-											required : true
-										},
-										email : {
-											required : true,
-											email : true
-										},
-										message : {
-											minlength : 2,
-											required : true
-										}
-									},
-									highlight : function(element) {
-										$(element).closest('.control-group')
-												.removeClass('success')
-												.addClass('error');
-									},
-									success : function(element) {
-										element.text('OK!').addClass('valid')
-												.closest('.control-group')
-												.removeClass('error').addClass(
-														'success');
-									}
-								});
-
 						$('#groupsAddRow')
 								.click(
 										function() {
@@ -279,13 +249,63 @@
 											$("#groupsSave").removeClass(
 													"disabled");
 										});
+						
+						// manuelles onChange behandeln (Kopieren)
+						$("[name='role-assignment-switch-copy']")
+								.bootstrapSwitch()
+								.on(
+										'switchChange.bootstrapSwitch',
+										function(event, state) {
+											var collectionIndex = event.target.id
+													.split("-");
+
+											$(
+													"#hiddenRoleSwitchValue-"
+															+ collectionIndex[1])
+													.val(state);
+
+											var assignedRoleRids = "";
+											// Status der Switches auslesen und zugeordnete Rolle speichern
+											$("tr.roleItemCopy")
+													.each(
+															function() {
+																var roleRid = $(
+																		this)
+																		.find(
+																				"input.hiddenRoleRid")
+																		.val();
+
+																var isAssigned = $(
+																		this)
+																		.find(
+																				"input.roleSwitch")
+																		.bootstrapSwitch(
+																				'state');
+
+																if (isAssigned) {
+																	if (assignedRoleRids.length == 0) {
+																		assignedRoleRids = assignedRoleRids
+																				+ roleRid;
+																	} else {
+																		assignedRoleRids = assignedRoleRids
+																				+ ","
+																				+ roleRid;
+																	}
+
+																}
+															});
+
+											$("#hiddenRoleRids-copy")
+													.val(assignedRoleRids);
+										});
 
 						$('.a_edit').click(function(event) {
 							onEditClick(event);
 						});
 
 						$('.a_copy').click(function(event) {
-							onCopyClick(event);
+							var collectionIndex = $(event.target).parent().attr('id').split("-");
+							onCopy(collectionIndex[1], false);
 						});
 
 						$('#buttonGroupCopySave').click(function() {
@@ -300,7 +320,16 @@
 							$("#roleEditPanel").modal('hide');
 							$("table tbody tr").removeClass('highlight');
 						});
-
+						
+						// Prüfen auf Fehler beim Gruppe Kopieren
+						var groupToCopyId = [[${groupConfig.groupToCopyId}]];
+						
+						if (groupToCopyId != null)
+							{
+								onCopy(groupToCopyId, true);
+							}
+						
+						// Ende Prüfen auf Fehler beim Gruppe Kopieren
 					});
 
 	function isRoleAssigned(rid, assignedRids) {
@@ -314,16 +343,24 @@
 
 		return false;
 	}
+	
+	function onCopy(groupId, isError) {
+		var groupName = $("#name-" + groupId).val();
 
-	function onCopyClick(event) {
-		var collectionIndex = $(event.target).parent().attr('id').split("-");
-
-		var groupName = $("#name-" + collectionIndex[1]).val();
-
-		var assignedRoleRids = $("#hiddenRoleRids-" + collectionIndex[1]).val();
+		var assignedRoleRids = $("#hiddenRoleRids-" + groupId).val();
+		
+		if (isError)
+			{
+			assignedRoleRids = $("#hiddenRoleRids-copy").val();
+			}	
+		else
+			{
+			$("#hiddenRoleRids-copy").val(assignedRoleRids);
+			}
 
 		// Headertext setzen
 		$("#roleCopyPanelHeadingName").text(" " + groupName);
+		$("#hiddenGroupToCopyRid").val(groupId);
 
 		// bereits zugeordnete Rollen initialisieren
 		$("tr.roleItemCopy").each(
@@ -428,7 +465,7 @@ body {
 					th:action="@{/admin/usergroup/save}" method="post"
 					th:object="${groupConfig}">
 
-					<div th:if="${#fields.hasErrors('*')}"
+					<div th:if="${#fields.hasErrors('groups*.*')}"
 						class="alert alert-danger alert-dismissible fade in" role="alert">
 						<button type="button" class="close" data-dismiss="alert"
 							aria-label="Close">
@@ -484,7 +521,6 @@ body {
 							</tr>
 						</tbody>
 						<input type="hidden" id="hiddenClientId" th:field="*{clientId}" />
-						<input type="hidden" id="hiddenRoles" th:field="*{roles}" />
 					</table>
 
 					<!-- Modal -->
@@ -580,14 +616,15 @@ body {
 												<td><select id="client-copy" class="form-control"
 													th:field="*{copyGroup.client}">
 														<option
-															th:each="client : ${beans.authenticationUtil.getClients()}"
-															th:field="*{copyGroup.client}" th:value="${client.id}"
-															th:text="${client.name}"></option>
+															th:each="copyClient : ${beans.authenticationUtil.getClients()}"
+															th:value="${copyClient}" th:text="${copyClient.name}"></option>
 												</select></td>
 												<td><input type="hidden" id="hiddenRid-copy"
 													th:field="*{copyGroup.id}" /> <input type="hidden"
 													id="hiddenRoleRids-copy" th:field="*{copyGroup.roleIds}" />
-													<input type="hidden" id="hiddenDoCopy" th:field="*{doCopy}" /></td>
+													<input type="hidden" id="hiddenDoCopy" th:field="*{doCopy}" />
+													<input type="hidden" id="hiddenGroupToCopyRid"
+													th:field="*{groupToCopyId}" /></td>
 											</tr>
 										</tbody>
 									</table>
@@ -610,7 +647,7 @@ body {
 												</td>
 												<td><input class="roleSwitch"
 													th:id="${'role-switch-'+stat.index}" type="checkbox"
-													name="role-assignment-switch" data-size="mini"
+													name="role-assignment-switch-copy" data-size="mini"
 													data-on-color="success" data-off-color="warning"></input> <input
 													class="hiddenRoleSwitchValue" type="hidden"
 													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
