@@ -614,10 +614,10 @@ body {
 													data-off-color="warning" /> <input type="hidden"
 													id="hiddenSwitch-copy" th:field="*{copyGroup.enabled}" /></td>
 												<td><select id="client-copy" class="form-control"
-													th:field="*{copyGroup.client}">
+													th:field="*{copyGroup.client.id}">
 														<option
-															th:each="copyClient : ${beans.authenticationUtil.getClients()}"
-															th:value="${copyClient}" th:text="${copyClient.name}"></option>
+															th:each="client : ${beans.authenticationUtil.getClients()}"
+															th:value="${client.id}" th:text="${client.name}"></option>
 												</select></td>
 												<td><input type="hidden" id="hiddenRid-copy"
 													th:field="*{copyGroup.id}" /> <input type="hidden"

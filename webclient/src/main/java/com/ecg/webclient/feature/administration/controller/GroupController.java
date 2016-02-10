@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.ecg.webclient.feature.administration.authentication.AuthenticationUtil;
+import com.ecg.webclient.feature.administration.service.ClientService;
 import com.ecg.webclient.feature.administration.service.GroupService;
 import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
 import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
+import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
@@ -47,6 +49,8 @@ public class GroupController
     @Autowired
     private GroupService       groupService;
     @Autowired
+    ClientService              clientService;
+    @Autowired
     private RoleService        roleService;
     @Autowired
     private AuthenticationUtil authUtil;
@@ -68,7 +72,11 @@ public class GroupController
             return getLoadingRedirectTemplate();
         }
 
+        // Hack, da Client nicht direkt gesetzt werden kann
+        ClientDto targetClient = clientService.getClient(groupConfig.getCopyGroup().getClient().getId());
+
         GroupDto copyGroup = groupConfig.getCopyGroup();
+        copyGroup.setClient(targetClient);
         groupService.saveGroup(copyGroup);
 
         return "redirect:";

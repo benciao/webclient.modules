@@ -17,16 +17,15 @@ public class GroupDto extends BaseObjectDto
 	private String		roleIds;
 	private ClientDto	client;
 
-	public GroupDto()
-	{
-	}
+    public GroupDto()
+    {}
 
-	public ClientDto getClient()
-	{
-		return client;
-	}
+    public ClientDto getClient()
+    {
+        return client;
+    }
 
-	public String getDescription()
+    public String getDescription()
 	{
 		return description;
 	}
