@@ -1,7 +1,9 @@
 package com.ecg.webclient.feature.administration.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -27,6 +29,8 @@ import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
 import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
 import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureRoleTreeGridDto;
 import com.ecg.webclient.feature.administration.viewmodell.GroupConfig;
 import com.ecg.webclient.feature.administration.viewmodell.GroupDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
@@ -132,11 +136,49 @@ public class GroupController
     @RequestMapping(method = RequestMethod.GET)
     public String showGroupConfig(Model model)
     {
-        List<RoleDto> roles = roleService.getAllRoles(false);
+        List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
+
+        Map<FeatureDto, List<RoleDto>> featureRoleMap = new HashMap<FeatureDto, List<RoleDto>>();
+
+        for (RoleDto role : roleService.getAllRoles(false))
+        {
+            if (featureRoleMap.containsKey(role.getFeature()))
+            {
+                featureRoleMap.get(role.getFeature()).add(role);
+            }
+            else
+            {
+                List<RoleDto> list = new ArrayList<RoleDto>();
+                list.add(role);
+                featureRoleMap.put(role.getFeature(), list);
+            }
+        }
+
+        long parentRow = -1;
+        long rowCounter = 0;
+        for (FeatureDto feature : featureRoleMap.keySet())
+        {
+            FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
+            featureRow.setFeatureName(feature.getName());
+            featureRow.setRowId(rowCounter);
+            parentRow = rowCounter;
+            rowCounter++;
+            featureRoleTreeGrid.add(featureRow);
+
+            for (RoleDto role : featureRoleMap.get(feature))
+            {
+                FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
+                roleRow.setRowId(rowCounter);
+                rowCounter++;
+                roleRow.setParentRowId(parentRow);
+                roleRow.setRole(role);
+                featureRoleTreeGrid.add(roleRow);
+            }
+        }
 
         GroupConfig groupConfig = new GroupConfig();
         groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
-        groupConfig.setRoles(roles);
+        groupConfig.setFeatureRoleTreeGrid(featureRoleTreeGrid);
         groupConfig.setClientId(authUtil.getSelectedClient().getId());
         groupConfig.setCopyGroup(new GroupDto());
         model.addAttribute("groupConfig", groupConfig);

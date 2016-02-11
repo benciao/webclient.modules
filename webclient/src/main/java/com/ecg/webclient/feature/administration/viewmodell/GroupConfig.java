@@ -12,6 +12,7 @@ public class GroupConfig
     @Valid
     private List<GroupDto> groups;
     private List<RoleDto>  roles;
+    private List<FeatureRoleTreeGridDto> featureRoleTreeGrid;
     @Valid
     private GroupDto       copyGroup;
     private long           clientId;
@@ -26,6 +27,15 @@ public class GroupConfig
     public GroupDto getCopyGroup()
     {
         return copyGroup;
+    }
+
+    public List<FeatureRoleTreeGridDto> getFeatureRoleTreeGrid()
+    {
+        if (featureRoleTreeGrid == null)
+        {
+            featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
+        }
+        return featureRoleTreeGrid;
     }
 
     public List<GroupDto> getGroups()
@@ -82,6 +92,11 @@ public class GroupConfig
     public void setDoCopy(boolean doCopy)
     {
         this.doCopy = doCopy;
+    }
+
+    public void setFeatureRoleTreeGrid(List<FeatureRoleTreeGridDto> featureRoleTreeGrid)
+    {
+        this.featureRoleTreeGrid = featureRoleTreeGrid;
     }
 
     public void setGroups(List<GroupDto> groups)
