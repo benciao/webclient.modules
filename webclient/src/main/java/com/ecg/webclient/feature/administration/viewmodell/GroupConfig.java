@@ -10,14 +10,13 @@ import org.springframework.util.AutoPopulatingList;
 public class GroupConfig
 {
     @Valid
-    private List<GroupDto> groups;
-    private List<RoleDto>  roles;
+    private List<GroupDto>               groups;
     private List<FeatureRoleTreeGridDto> featureRoleTreeGrid;
     @Valid
-    private GroupDto       copyGroup;
-    private long           clientId;
-    private boolean        doCopy = false;
-    private Long           groupToCopyId;
+    private GroupDto                     copyGroup;
+    private long                         clientId;
+    private boolean                      doCopy = false;
+    private Long                         groupToCopyId;
 
     public long getClientId()
     {
@@ -50,15 +49,6 @@ public class GroupConfig
     public Long getGroupToCopyId()
     {
         return groupToCopyId;
-    }
-
-    public List<RoleDto> getRoles()
-    {
-        if (roles == null)
-        {
-            roles = new ArrayList<RoleDto>();
-        }
-        return roles;
     }
 
     public boolean isDoCopy()
@@ -107,10 +97,5 @@ public class GroupConfig
     public void setGroupToCopyId(Long groupToCopyId)
     {
         this.groupToCopyId = groupToCopyId;
-    }
-
-    public void setRoles(List<RoleDto> roles)
-    {
-        this.roles = roles;
     }
 }

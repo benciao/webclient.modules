@@ -334,7 +334,13 @@
 						
 						// Ende Prüfen auf Fehler beim Gruppe Kopieren
 						
-						$('#roleTable').treegrid();
+						$('#roleTable').treegrid({
+							initialState: 'collapsed'
+				        });
+				        
+				        $('#roleCopyTable').treegrid({
+							initialState: 'collapsed'
+				        });
 					});
 
 	function isRoleAssigned(rid, assignedRids) {
@@ -551,7 +557,7 @@ body {
 										</thead>
 										<tbody>
 											<tr
-												th:attr="class=*{featureRoleTreeGrid[__${stat.index}__].featureName != null ? 'roleItem treegrid-' + featureRoleTreeGrid[__${stat.index}__].rowId : ''}"
+												th:attr="class=*{featureRoleTreeGrid[__${stat.index}__].featureName != null ? 'treegrid-' + featureRoleTreeGrid[__${stat.index}__].rowId : ''}"
 												th:attrappend="class=*{featureRoleTreeGrid[__${stat.index}__].featureName == null ? 'roleItem treegrid-' + featureRoleTreeGrid[__${stat.index}__].rowId + ' treegrid-parent-' + featureRoleTreeGrid[__${stat.index}__].parentRowId : ''}"
 												th:each="item, stat : *{featureRoleTreeGrid}">
 												<td><span
@@ -571,12 +577,17 @@ body {
 													type="checkbox" name="role-assignment-switch"
 													data-size="mini" data-on-color="success"
 													data-off-color="warning"></input> <input
+													th:if="*{featureRoleTreeGrid[__${stat.index}__].role != null}"
 													class="hiddenRoleSwitchValue" type="hidden"
 													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
-													value="false" /> <input class="hiddenRoleRid"
+													value="false" /> <input
+													th:if="*{featureRoleTreeGrid[__${stat.index}__].role != null}"
+													class="hiddenRoleRid"
 													th:id="${'hiddenRoleRid-'+stat.index}" type="hidden"
 													th:field="*{featureRoleTreeGrid[__${stat.index}__].role.id}" />
-													<input class="hiddenGroupRid"
+													<input
+													th:if="*{featureRoleTreeGrid[__${stat.index}__].role != null}"
+													class="hiddenGroupRid"
 													th:id="${'hiddenGroupRid-'+stat.index}" type="hidden"
 													value="" /></td>
 											</tr>
@@ -647,30 +658,41 @@ body {
 									</table>
 
 									<table class="table table-hover table-striped table-condensed"
-										id="roleTable">
+										id="roleCopyTable">
 										<thead>
 											<tr>
+												<th><span th:text="#{rolesTableFeature}"></span></th>
 												<th><span th:text="#{rolesTableName}"></span></th>
 												<th><span th:text="#{rolesTableDescription}"></span></th>
 												<th><span th:text="#{roleAssigned}"></span></th>
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="roleItemCopy" th:each="item, stat : *{roles}">
-												<td><span th:text="*{roles[__${stat.index}__].name}"></span>
-												</td>
+											<tr
+												th:attr="class=*{featureRoleTreeGrid[__${status.index}__].featureName != null ? 'treegrid-' + featureRoleTreeGrid[__${status.index}__].rowId : ''}"
+												th:attrappend="class=*{featureRoleTreeGrid[__${status.index}__].featureName == null ? 'roleItemCopy treegrid-' + featureRoleTreeGrid[__${status.index}__].rowId + ' treegrid-parent-' + featureRoleTreeGrid[__${status.index}__].parentRowId : ''}"
+												th:each="item, status : *{featureRoleTreeGrid}">
 												<td><span
-													th:text="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}"></span>
+													th:text="*{featureRoleTreeGrid[__${status.index}__].featureName}"></span></td>
+												<td><span
+													th:if="*{featureRoleTreeGrid[__${status.index}__].role != null}"
+													th:text="*{featureRoleTreeGrid[__${status.index}__].role.name}"></span>
 												</td>
-												<td><input class="roleSwitch"
-													th:id="${'role-switch-'+stat.index}" type="checkbox"
-													name="role-assignment-switch-copy" data-size="mini"
-													data-on-color="success" data-off-color="warning"></input> <input
+												<td></td>
+												<td><input
+													th:if="*{featureRoleTreeGrid[__${status.index}__].role != null}"
+													class="roleSwitch" th:id="${'role-switch-'+status.index}"
+													type="checkbox" name="role-assignment-switch-copy"
+													data-size="mini" data-on-color="success"
+													data-off-color="warning"></input> <input
+													th:if="*{featureRoleTreeGrid[__${status.index}__].role != null}"
 													class="hiddenRoleSwitchValue" type="hidden"
-													th:id="${'hiddenRoleSwitchValue-'+stat.index}"
-													value="false" /> <input class="hiddenRoleRid"
-													th:id="${'hiddenRoleRid-'+stat.index}" type="hidden"
-													th:field="*{roles[__${stat.index}__].id}" /></td>
+													th:id="${'hiddenRoleSwitchValue-'+status.index}"
+													value="false" /> <input
+													th:if="*{featureRoleTreeGrid[__${status.index}__].role != null}"
+													class="hiddenRoleRid"
+													th:id="${'hiddenRoleRid-'+status.index}" type="hidden"
+													th:field="*{featureRoleTreeGrid[__${status.index}__].role.id}" /></td>
 											</tr>
 										</tbody>
 									</table>
