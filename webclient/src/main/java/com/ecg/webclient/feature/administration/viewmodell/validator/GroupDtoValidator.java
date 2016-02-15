@@ -38,15 +38,12 @@ public class GroupDtoValidator implements Validator
         {
             GroupDto copyGroup = ((GroupConfig) object).getCopyGroup();
 
-            if (copyGroup.getId() == -1)
-            {
-                GroupDto result = groupService.getGroupByNameForCurrentClient(copyGroup.getName(), copyGroup
-                        .getClient().getId());
+            GroupDto result = groupService.getGroupByNameForCurrentClient(copyGroup.getName(), copyGroup
+                    .getClient().getId());
 
-                if (result != null)
-                {
-                    errors.rejectValue("copyGroup.name", "group.rejected.duplicated.name");
-                }
+            if (result != null)
+            {
+                errors.rejectValue("copyGroup.name", "group.rejected.duplicated.name");
             }
 
             if (copyGroup.getName().isEmpty() || copyGroup.getName().length() < 4
