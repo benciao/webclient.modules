@@ -2,6 +2,7 @@ package com.ecg.webclient.feature.administration.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -137,6 +138,23 @@ public class UserController
     }
 
     /**
+     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
+     * 
+     * @return
+     */
+    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
+            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+    @RequestMapping(value = "/clientgroups/{clientId}", method = RequestMethod.GET)
+    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
+    {
+        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
+
+        model.addAttribute("groups", groups);
+
+        return "feature/administration/user :: clientGroups";
+    }
+
+    /**
      * Behandelt GET-Requests vom Typ "/admin/user". Lädt alle Benutzer.
      * 
      * @return Template
@@ -147,7 +165,9 @@ public class UserController
     public String showUserConfig(Model model)
     {
         UserConfig userConfig = new UserConfig();
-        userConfig.setUsers(userService.getAllUsers(false));
+        List<UserDto> users = userService.getAllUsers(false);
+        Collections.sort(users, UserDto.UserDtoComparator);
+        userConfig.setUsers(users);
         model.addAttribute("userConfig", userConfig);
 
         return getLoadingRedirectTemplate();
@@ -163,7 +183,7 @@ public class UserController
     {
         binder.setValidator(userDtoValidator);
     }
-
+    
     private static List<Long> getGroupIds(String groupIds)
     {
         List<Long> result = new ArrayList<Long>();
@@ -176,23 +196,6 @@ public class UserController
         }
 
         return result.size() != 0 ? result : null;
-    }
-    
-    /**
-     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
-     * 
-     * @return
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/clientgroups/{clientId}", method = RequestMethod.GET)
-    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
-    {
-        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
-
-        model.addAttribute("groups", groups);
-
-        return "feature/administration/user :: clientGroups";
     }
 
 }

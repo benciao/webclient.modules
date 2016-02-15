@@ -1,5 +1,7 @@
 package com.ecg.webclient.feature.administration.viewmodell;
 
+import java.util.Comparator;
+
 /**
  * Implementierung eines von der Persistenz detachten Features.
  * 
@@ -7,96 +9,108 @@ package com.ecg.webclient.feature.administration.viewmodell;
  */
 public class FeatureDto extends BaseObjectDto
 {
-	private String	name;
-	private boolean	enabled;
-	private boolean	deactivatable;
-	private boolean	selected;
-	private String	iconPath;
-	private String	link;
-	private String	i18nVariable;
-	private String	loadingRedirectTemplate;
+    public static Comparator<FeatureDto> FeatureDtoComparator = new Comparator<FeatureDto>()
+                                                              {
 
-	public FeatureDto()
-	{
-	}
+                                                                  @Override
+                                                                  public int compare(FeatureDto f1,
+                                                                          FeatureDto f2)
+                                                                  {
+                                                                      return f1.getName().compareTo(
+                                                                              f2.getName());
+                                                                  }
 
-	public boolean isSelected()
-	{
-		return selected;
-	}
+                                                              };
 
-	public void setSelected(boolean selected)
-	{
-		this.selected = selected;
-	}
+    private String                       name;
+    private boolean                      enabled;
+    private boolean                      deactivatable;
+    private boolean                      selected;
+    private String                       iconPath;
+    private String                       link;
+    private String                       i18nVariable;
+    private String                       loadingRedirectTemplate;
 
-	public String getIconPath()
-	{
-		return iconPath;
-	}
+    public FeatureDto()
+    {}
 
-	public void setIconPath(String iconPath)
-	{
-		this.iconPath = iconPath;
-	}
+    public String getI18nVariable()
+    {
+        return i18nVariable;
+    }
 
-	public String getLoadingRedirectTemplate()
-	{
-		return loadingRedirectTemplate;
-	}
+    public String getIconPath()
+    {
+        return iconPath;
+    }
 
-	public void setLoadingRedirectTemplate(String loadingRedirectTemplate)
-	{
-		this.loadingRedirectTemplate = loadingRedirectTemplate;
-	}
+    public String getLink()
+    {
+        return link;
+    }
 
-	public String getLink()
-	{
-		return link;
-	}
+    public String getLoadingRedirectTemplate()
+    {
+        return loadingRedirectTemplate;
+    }
 
-	public void setLink(String link)
-	{
-		this.link = link;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public String getI18nVariable()
-	{
-		return i18nVariable;
-	}
+    public boolean isDeactivatable()
+    {
+        return deactivatable;
+    }
 
-	public void setI18nVariable(String i18nVariable)
-	{
-		this.i18nVariable = i18nVariable;
-	}
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
 
-	public String getName()
-	{
-		return name;
-	}
+    public boolean isSelected()
+    {
+        return selected;
+    }
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    public void setDeactivatable(boolean deactivatable)
+    {
+        this.deactivatable = deactivatable;
+    }
 
-	public boolean isDeactivatable()
-	{
-		return deactivatable;
-	}
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
 
-	public void setDeactivatable(boolean deactivatable)
-	{
-		this.deactivatable = deactivatable;
-	}
+    public void setI18nVariable(String i18nVariable)
+    {
+        this.i18nVariable = i18nVariable;
+    }
 
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
+    public void setIconPath(String iconPath)
+    {
+        this.iconPath = iconPath;
+    }
 
-	public void setEnabled(boolean enabled)
-	{
-		this.enabled = enabled;
-	}
+    public void setLink(String link)
+    {
+        this.link = link;
+    }
+
+    public void setLoadingRedirectTemplate(String loadingRedirectTemplate)
+    {
+        this.loadingRedirectTemplate = loadingRedirectTemplate;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public void setSelected(boolean selected)
+    {
+        this.selected = selected;
+    }
 }

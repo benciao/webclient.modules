@@ -1,9 +1,9 @@
 package com.ecg.webclient.feature.administration.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import javax.validation.Valid;
 
@@ -136,9 +136,35 @@ public class GroupController
     @RequestMapping(method = RequestMethod.GET)
     public String showGroupConfig(Model model)
     {
+        GroupConfig groupConfig = new GroupConfig();
+        List<GroupDto> groups = groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId());
+        Collections.sort(groups, GroupDto.GroupDtoComparator);
+        groupConfig.setGroups(groups);
+        groupConfig.setFeatureRoleTreeGrid(generateTreeGrid());
+        groupConfig.setClientId(authUtil.getSelectedClient().getId());
+        groupConfig.setCopyGroup(new GroupDto());
+        model.addAttribute("groupConfig", groupConfig);
+
+        return getLoadingRedirectTemplate();
+    }
+
+    protected String getLoadingRedirectTemplate()
+    {
+        return "feature/administration/usergroup";
+    }
+
+    @InitBinder("groupConfig")
+    protected void initGroupBinder(WebDataBinder binder)
+    {
+        binder.setValidator(groupDtoValidator);
+    }
+
+    private List<FeatureRoleTreeGridDto> generateTreeGrid()
+    {
         List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
 
-        Map<FeatureDto, List<RoleDto>> featureRoleMap = new HashMap<FeatureDto, List<RoleDto>>();
+        TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
+                FeatureDto.FeatureDtoComparator);
 
         for (RoleDto role : roleService.getAllRoles(false))
         {
@@ -152,6 +178,11 @@ public class GroupController
                 list.add(role);
                 featureRoleMap.put(role.getFeature(), list);
             }
+        }
+
+        for (List<RoleDto> roleList : featureRoleMap.values())
+        {
+            Collections.sort(roleList, RoleDto.RoleDtoComparator);
         }
 
         long parentRow = -1;
@@ -176,24 +207,6 @@ public class GroupController
             }
         }
 
-        GroupConfig groupConfig = new GroupConfig();
-        groupConfig.setGroups(groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId()));
-        groupConfig.setFeatureRoleTreeGrid(featureRoleTreeGrid);
-        groupConfig.setClientId(authUtil.getSelectedClient().getId());
-        groupConfig.setCopyGroup(new GroupDto());
-        model.addAttribute("groupConfig", groupConfig);
-
-        return getLoadingRedirectTemplate();
-    }
-
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/usergroup";
-    }
-
-    @InitBinder("groupConfig")
-    protected void initGroupBinder(WebDataBinder binder)
-    {
-        binder.setValidator(groupDtoValidator);
+        return featureRoleTreeGrid;
     }
 }

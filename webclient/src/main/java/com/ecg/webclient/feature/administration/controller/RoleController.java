@@ -1,6 +1,7 @@
 package com.ecg.webclient.feature.administration.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -35,7 +36,6 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 public class RoleController
 {
     static final Logger logger = LogManager.getLogger(RoleController.class.getName());
-
     @Autowired
     private RoleService roleService;
 
@@ -89,7 +89,9 @@ public class RoleController
     public String showRoleConfig(Model model)
     {
         RoleConfig roleConfig = new RoleConfig();
-        roleConfig.setRoles(roleService.getAllRoles(false));
+        List<RoleDto> roles = roleService.getAllRoles(false);
+        Collections.sort(roles, RoleDto.RoleDtoComparator);
+        roleConfig.setRoles(roles);
         model.addAttribute("roleConfig", roleConfig);
 
         return getLoadingRedirectTemplate();

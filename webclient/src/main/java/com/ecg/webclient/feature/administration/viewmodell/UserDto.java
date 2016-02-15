@@ -2,6 +2,7 @@ package com.ecg.webclient.feature.administration.viewmodell;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,17 @@ import java.util.List;
  */
 public class UserDto extends BaseObjectDto
 {
+    public static Comparator<UserDto> UserDtoComparator = new Comparator<UserDto>()
+                                                        {
+
+                                                            @Override
+                                                            public int compare(UserDto u1, UserDto u2)
+                                                            {
+                                                                return u1.getLogin().compareTo(u2.getLogin());
+                                                            }
+
+                                                        };
+
     private String  login;
     private boolean internal;
     private String  lastname;
