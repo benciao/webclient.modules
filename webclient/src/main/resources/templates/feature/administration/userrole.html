@@ -60,6 +60,10 @@
 
 							row.hide();
 						});
+
+				$('#roleTable').treegrid({
+					initialState : 'collapsed'
+				});
 			});
 	/*]]>*/
 </script>
@@ -95,7 +99,8 @@ body {
 					</div>
 					<div class="collapse navbar-collapse">
 						<ul class="nav navbar-right">
-							<button type="button" class="btn btn-ws btn-default navbar-btn disabled"
+							<button type="button"
+								class="btn btn-ws btn-default navbar-btn disabled"
 								id="rolesSave">
 								<span th:text="#{rolesActionSave}"></span>
 							</button>
@@ -125,51 +130,74 @@ body {
 						id="roleTable">
 						<thead>
 							<tr>
-								<th><span th:text="#{rolesTableName}"></span></th>
 								<th><span th:text="#{rolesTableFeature}"></span></th>
+								<th><span th:text="#{rolesTableName}"></span></th>
 								<th><span th:text="#{rolesTableDescription}"></span></th>
 								<th><span th:text="#{rolesTableStatus}"></span></th>
 								<th><span th:text="#{rolesTableActions}"></span></th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="item, stat : *{roles}">
-								<td><input th:id="${'name-'+stat.index}" type="text"
-									readonly="true" class="form-control" placeholder="Name"
-									th:field="*{roles[__${stat.index}__].name}"
-									th:errorclass="field-tip" /> <span class="tip-content"
-									th:errors="*{roles[__${stat.index}__].name}"></span></td>
-								<td><input th:id="${'feature'+stat.index}" readonly="true"
-									type="text" class="form-control" placeholder="Feature"
-									th:field="*{roles[__${stat.index}__].feature.name}" /></td>
-								<td><input th:id="${'description-'+stat.index}"
-									readonly="true" type="text" class="form-control"
-									placeholder="Beschreibung"
-									th:value="#{*{'accessrole.' + roles[__${stat.index}__].feature.name + '_' +roles[__${stat.index}__].name}}" />
+							<tr
+								th:attr="class=*{featureRoleTreeGrid[__${stat.index}__].featureName != null ? 'treegrid-' + featureRoleTreeGrid[__${stat.index}__].rowId : ''}"
+								th:attrappend="class=*{featureRoleTreeGrid[__${stat.index}__].featureName == null ? 'roleItem treegrid-' + featureRoleTreeGrid[__${stat.index}__].rowId + ' treegrid-parent-' + featureRoleTreeGrid[__${stat.index}__].parentRowId : ''}"
+								th:each="item, stat : *{featureRoleTreeGrid}">
+								<td><span
+									th:text="*{featureRoleTreeGrid[__${stat.index}__].featureName}"></span>
 								</td>
-								<td><input th:id="${'switch-'+stat.index}" type="checkbox"
+								<td><input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									th:id="${'name-'+stat.index}" type="text" readonly="true"
+									class="form-control" placeholder="Name"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.name}"
+									th:errorclass="field-tip" /> <span class="tip-content"
+									th:errors="*{featureRoleTreeGrid[__${stat.index}__].role.name}"></span></td>
+								<td><input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									th:id="${'description-'+stat.index}" readonly="true"
+									type="text" class="form-control" placeholder="Beschreibung"
+									th:value="#{*{'accessrole.' + featureRoleTreeGrid[__${stat.index}__].role.feature.name + '_' +featureRoleTreeGrid[__${stat.index}__].role.name}}" />
+								</td>
+								<td><input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									th:id="${'switch-'+stat.index}" type="checkbox"
 									name="role-state-switch" data-size="mini"
-									th:checked="*{roles[__${stat.index}__].enabled}"
+									th:checked="*{featureRoleTreeGrid[__${stat.index}__].role.enabled}"
 									data-on-color="success" data-off-color="warning"></input> <input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
 									type="hidden" th:id="${'hiddenSwitch-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].enabled}" /></td>
-								<td><a class="a_delete" th:id="${'a_delete-'+stat.index}"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.enabled}" /></td>
+								<td><a th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}" class="a_delete" th:id="${'a_delete-'+stat.index}"
 									href="#" th:title="#{rolesActionDelete}"> <span
 										class="glyphicon glyphicon-remove"> </span>
-								</a> <input type="hidden" th:id="${'hiddenRid-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].id}" /> <input
+								</a> <input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									type="hidden" th:id="${'hiddenRid-'+stat.index}"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.id}" />
+									<input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
 									type="hidden" th:id="${'hiddenDelete-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].delete}" /> <input
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.delete}" />
+									<input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									type="hidden" th:id="${'feature-name'+stat.index}"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.feature.name}"
+									th:value="*{featureRoleTreeGrid[__${stat.index}__].role.feature.name}" />
+									<input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
 									type="hidden" th:id="${'feature-id-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].feature.id}"
-									th:value="${roleConfig.roles[__${stat.index}__].feature.id}" />
-									<input type="hidden" th:id="${'feature-enabled-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].feature.enabled}"
-									th:value="${roleConfig.roles[__${stat.index}__].feature.enabled}" />
-									<input type="hidden"
-									th:id="${'feature-deactivatable-'+stat.index}"
-									th:field="*{roles[__${stat.index}__].feature.deactivatable}"
-									th:value="${roleConfig.roles[__${stat.index}__].feature.deactivatable}" />
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.feature.id}"
+									th:value="*{featureRoleTreeGrid[__${stat.index}__].role.feature.id}" />
+									<input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									type="hidden" th:id="${'feature-enabled-'+stat.index}"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.feature.enabled}"
+									th:value="*{featureRoleTreeGrid[__${stat.index}__].role.feature.enabled}" />
+									<input
+									th:if="*{featureRoleTreeGrid[__${stat.index}__].featureName == null}"
+									type="hidden" th:id="${'feature-deactivatable-'+stat.index}"
+									th:field="*{featureRoleTreeGrid[__${stat.index}__].role.feature.deactivatable}"
+									th:value="*{featureRoleTreeGrid[__${stat.index}__].role.feature.deactivatable}" />
 								</td>
 							</tr>
 						</tbody>

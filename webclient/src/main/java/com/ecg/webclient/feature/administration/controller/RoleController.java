@@ -3,6 +3,7 @@ package com.ecg.webclient.feature.administration.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.validation.Valid;
 
@@ -21,6 +22,8 @@ import com.ecg.webclient.feature.administration.service.RoleService;
 import com.ecg.webclient.feature.administration.setup.AdministrationFeature;
 import com.ecg.webclient.feature.administration.setup.SecurityAdminAccessRole;
 import com.ecg.webclient.feature.administration.setup.SetupSystemAccessRole;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
+import com.ecg.webclient.feature.administration.viewmodell.FeatureRoleTreeGridDto;
 import com.ecg.webclient.feature.administration.viewmodell.RoleConfig;
 import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 
@@ -52,15 +55,18 @@ public class RoleController
         List<RoleDto> updateDtos = new ArrayList<RoleDto>();
         List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
 
-        for (RoleDto dto : roleConfig.getRoles())
+        for (FeatureRoleTreeGridDto dto : roleConfig.getFeatureRoleTreeGrid())
         {
-            if (dto.isDelete())
+            if (dto.getRole() != null)
             {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                updateDtos.add(dto);
+                if (dto.getRole().isDelete())
+                {
+                    deleteDtos.add(dto.getRole());
+                }
+                else
+                {
+                    updateDtos.add(dto.getRole());
+                }
             }
         }
 
@@ -91,7 +97,7 @@ public class RoleController
         RoleConfig roleConfig = new RoleConfig();
         List<RoleDto> roles = roleService.getAllRoles(false);
         Collections.sort(roles, RoleDto.RoleDtoComparator);
-        roleConfig.setRoles(roles);
+        roleConfig.setFeatureRoleTreeGrid(generateTreeGrid());
         model.addAttribute("roleConfig", roleConfig);
 
         return getLoadingRedirectTemplate();
@@ -100,5 +106,56 @@ public class RoleController
     protected String getLoadingRedirectTemplate()
     {
         return "feature/administration/userrole";
+    }
+
+    private List<FeatureRoleTreeGridDto> generateTreeGrid()
+    {
+        List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
+
+        TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
+                FeatureDto.FeatureDtoComparator);
+
+        for (RoleDto role : roleService.getAllRoles(false))
+        {
+            if (featureRoleMap.containsKey(role.getFeature()))
+            {
+                featureRoleMap.get(role.getFeature()).add(role);
+            }
+            else
+            {
+                List<RoleDto> list = new ArrayList<RoleDto>();
+                list.add(role);
+                featureRoleMap.put(role.getFeature(), list);
+            }
+        }
+
+        for (List<RoleDto> roleList : featureRoleMap.values())
+        {
+            Collections.sort(roleList, RoleDto.RoleDtoComparator);
+        }
+
+        long parentRow = -1;
+        long rowCounter = 0;
+        for (FeatureDto feature : featureRoleMap.keySet())
+        {
+            FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
+            featureRow.setFeatureName(feature.getName());
+            featureRow.setRowId(rowCounter);
+            parentRow = rowCounter;
+            rowCounter++;
+            featureRoleTreeGrid.add(featureRow);
+
+            for (RoleDto role : featureRoleMap.get(feature))
+            {
+                FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
+                roleRow.setRowId(rowCounter);
+                rowCounter++;
+                roleRow.setParentRowId(parentRow);
+                roleRow.setRole(role);
+                featureRoleTreeGrid.add(roleRow);
+            }
+        }
+
+        return featureRoleTreeGrid;
     }
 }

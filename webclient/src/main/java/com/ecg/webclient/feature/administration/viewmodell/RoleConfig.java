@@ -5,37 +5,38 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.util.AutoPopulatingList;
-
 public class RoleConfig
 {
     @Valid
-    private List<RoleDto> roles;
+    private List<FeatureRoleTreeGridDto> featureRoleTreeGrid;
 
-    public List<RoleDto> getRoles()
+    public List<FeatureRoleTreeGridDto> getFeatureRoleTreeGrid()
     {
-        if (roles == null)
+        if (featureRoleTreeGrid == null)
         {
-            roles = new AutoPopulatingList<RoleDto>(RoleDto.class);
+            featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
         }
-        return roles;
+        return featureRoleTreeGrid;
     }
 
     public void removeDeleted()
     {
-        List<RoleDto> rolesToRemove = new ArrayList<RoleDto>();
-        for (RoleDto role : roles)
+        List<FeatureRoleTreeGridDto> rowsToRemove = new ArrayList<FeatureRoleTreeGridDto>();
+        for (FeatureRoleTreeGridDto row : featureRoleTreeGrid)
         {
-            if (role.isDelete())
+            if (row.getRole() != null)
             {
-                rolesToRemove.add(role);
+                if (row.getRole().isDelete())
+                {
+                    rowsToRemove.add(row);
+                }
             }
         }
-        roles.removeAll(rolesToRemove);
+        featureRoleTreeGrid.removeAll(rowsToRemove);
     }
 
-    public void setRoles(List<RoleDto> roles)
+    public void setFeatureRoleTreeGrid(List<FeatureRoleTreeGridDto> featureRoleTreeGrid)
     {
-        this.roles = roles;
+        this.featureRoleTreeGrid = featureRoleTreeGrid;
     }
 }
