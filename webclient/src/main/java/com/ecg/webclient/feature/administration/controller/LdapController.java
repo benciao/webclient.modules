@@ -30,74 +30,82 @@ import com.ecg.webclient.feature.administration.viewmodell.LdapConfigDto;
 @RequestMapping(value = "/admin/ldap")
 public class LdapController
 {
-    static final Logger logger = LogManager.getLogger(LdapController.class.getName());
+	static final Logger logger = LogManager.getLogger(LdapController.class.getName());
 
-    @Autowired
-    private LdapConfigService ldapConfigService;
+	private LdapConfigService ldapConfigService;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/ldap/save". Speichert Änderungen an der LDAP-konfiguration.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveLdapConfig(@Valid LdapConfigDto ldapConfig, BindingResult bindingResult)
-    {
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+	@Autowired
+	public LdapController(LdapConfigService ldapConfigService)
+	{
+		this.ldapConfigService = ldapConfigService;
+	}
 
-        ldapConfigService.saveLdapConfig(ldapConfig);
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/ldap/save". Speichert Änderungen
+	 * an der LDAP-konfiguration.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveLdapConfig(@Valid LdapConfigDto ldapConfig, BindingResult bindingResult)
+	{
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		ldapConfigService.saveLdapConfig(ldapConfig);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/ldap". Lädt alle LDAP-konfigurationen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showLdapConfig(Model model)
-    {
-        LdapConfigDto ldapConfig = ldapConfigService.getLdapConfig();
-        if (ldapConfig == null)
-        {
-            ldapConfig = new LdapConfigDto();
-        }
-        model.addAttribute("ldapConfigDto", ldapConfig);
+		return "redirect:";
+	}
 
-        return getLoadingRedirectTemplate();
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/ldap". Lädt alle
+	 * LDAP-konfigurationen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showLdapConfig(Model model)
+	{
+		LdapConfigDto ldapConfig = ldapConfigService.getLdapConfig();
+		if (ldapConfig == null)
+		{
+			ldapConfig = new LdapConfigDto();
+		}
+		model.addAttribute("ldapConfigDto", ldapConfig);
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/ldap/test". Testet die LDAP-konfiguration.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/test", method = RequestMethod.POST)
-    public String testLdapConfig(@Valid LdapConfigDto ldapConfig, BindingResult bindingResult)
-    {
-        if (ldapConfigService.isLdapConfigOk(ldapConfig))
-        {
-            ldapConfig.setConnectionSuccessful(true);
-        }
-        else
-        {
-            ldapConfig.setConnectionSuccessful(false);
-        }
-        return getLoadingRedirectTemplate();
-    }
+		return getLoadingRedirectTemplate();
+	}
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/ldap";
-    }
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/ldap/test". Testet die
+	 * LDAP-konfiguration.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/test", method = RequestMethod.POST)
+	public String testLdapConfig(@Valid LdapConfigDto ldapConfig, BindingResult bindingResult)
+	{
+		if (ldapConfigService.isLdapConfigOk(ldapConfig))
+		{
+			ldapConfig.setConnectionSuccessful(true);
+		}
+		else
+		{
+			ldapConfig.setConnectionSuccessful(false);
+		}
+		return getLoadingRedirectTemplate();
+	}
+
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/ldap";
+	}
 }

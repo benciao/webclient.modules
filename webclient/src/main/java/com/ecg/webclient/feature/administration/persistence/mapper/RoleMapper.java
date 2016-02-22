@@ -20,10 +20,15 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 @Component
 public class RoleMapper
 {
+	private RoleRepository	roleRepo;
+	private FeatureMapper	featureMapper;
+
 	@Autowired
-	RoleRepository	roleRepo;
-	@Autowired
-	FeatureMapper	featureMapper;
+	public RoleMapper(RoleRepository roleRepo, FeatureMapper featureMapper)
+	{
+		this.roleRepo = roleRepo;
+		this.featureMapper = featureMapper;
+	}
 
 	/**
 	 * Wandelt eine attachte Rolle in eine detachte um.

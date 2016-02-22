@@ -29,10 +29,15 @@ public class RemoteLoginController
 {
 	static final Logger logger = LogManager.getLogger(RemoteLoginController.class.getName());
 
+	private RemoteLoginService	remoteLoginService;
+	private AuthenticationUtil	authUtil;
+
 	@Autowired
-	RemoteLoginService	remoteLoginService;
-	@Autowired
-	AuthenticationUtil	authUtil;
+	public RemoteLoginController(RemoteLoginService remoteLoginService, AuthenticationUtil authUtil)
+	{
+		this.remoteLoginService = remoteLoginService;
+		this.authUtil = authUtil;
+	}
 
 	protected String getLoadingRedirectTemplate()
 	{

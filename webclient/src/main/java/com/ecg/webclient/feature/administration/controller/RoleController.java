@@ -38,124 +38,132 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 @RequestMapping(value = "/admin/userrole")
 public class RoleController
 {
-    static final Logger logger = LogManager.getLogger(RoleController.class.getName());
-    @Autowired
-    private RoleService roleService;
+	static final Logger logger = LogManager.getLogger(RoleController.class.getName());
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/userrole/save". Speichert Änderungen an Benutzerrollen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
-    {
-        List<RoleDto> updateDtos = new ArrayList<RoleDto>();
-        List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
+	private RoleService roleService;
 
-        for (FeatureRoleTreeGridDto dto : roleConfig.getFeatureRoleTreeGrid())
-        {
-            if (dto.getRole() != null)
-            {
-                if (dto.getRole().isDelete())
-                {
-                    deleteDtos.add(dto.getRole());
-                }
-                else
-                {
-                    updateDtos.add(dto.getRole());
-                }
-            }
-        }
+	@Autowired
+	public RoleController(RoleService roleService)
+	{
+		this.roleService = roleService;
+	}
 
-        roleService.deleteRoles(deleteDtos);
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/userrole/save". Speichert
+	 * Änderungen an Benutzerrollen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String save(@Valid RoleConfig roleConfig, BindingResult bindingResult)
+	{
+		List<RoleDto> updateDtos = new ArrayList<RoleDto>();
+		List<RoleDto> deleteDtos = new ArrayList<RoleDto>();
 
-        roleConfig.removeDeleted();
+		for (FeatureRoleTreeGridDto dto : roleConfig.getFeatureRoleTreeGrid())
+		{
+			if (dto.getRole() != null)
+			{
+				if (dto.getRole().isDelete())
+				{
+					deleteDtos.add(dto.getRole());
+				}
+				else
+				{
+					updateDtos.add(dto.getRole());
+				}
+			}
+		}
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		roleService.deleteRoles(deleteDtos);
 
-        roleService.saveRoles(updateDtos);
+		roleConfig.removeDeleted();
 
-        return "redirect:";
-    }
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/userrole". Lädt alle Benutzerrollen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showRoleConfig(Model model)
-    {
-        RoleConfig roleConfig = new RoleConfig();
-        List<RoleDto> roles = roleService.getAllRoles(false);
-        Collections.sort(roles, RoleDto.RoleDtoComparator);
-        roleConfig.setFeatureRoleTreeGrid(generateTreeGrid());
-        model.addAttribute("roleConfig", roleConfig);
+		roleService.saveRoles(updateDtos);
 
-        return getLoadingRedirectTemplate();
-    }
+		return "redirect:";
+	}
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/userrole";
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/userrole". Lädt alle
+	 * Benutzerrollen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showRoleConfig(Model model)
+	{
+		RoleConfig roleConfig = new RoleConfig();
+		List<RoleDto> roles = roleService.getAllRoles(false);
+		Collections.sort(roles, RoleDto.RoleDtoComparator);
+		roleConfig.setFeatureRoleTreeGrid(generateTreeGrid());
+		model.addAttribute("roleConfig", roleConfig);
 
-    private List<FeatureRoleTreeGridDto> generateTreeGrid()
-    {
-        List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
+		return getLoadingRedirectTemplate();
+	}
 
-        TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
-                FeatureDto.FeatureDtoComparator);
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/userrole";
+	}
 
-        for (RoleDto role : roleService.getAllRoles(false))
-        {
-            if (featureRoleMap.containsKey(role.getFeature()))
-            {
-                featureRoleMap.get(role.getFeature()).add(role);
-            }
-            else
-            {
-                List<RoleDto> list = new ArrayList<RoleDto>();
-                list.add(role);
-                featureRoleMap.put(role.getFeature(), list);
-            }
-        }
+	private List<FeatureRoleTreeGridDto> generateTreeGrid()
+	{
+		List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
 
-        for (List<RoleDto> roleList : featureRoleMap.values())
-        {
-            Collections.sort(roleList, RoleDto.RoleDtoComparator);
-        }
+		TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
+				FeatureDto.FeatureDtoComparator);
 
-        long parentRow = -1;
-        long rowCounter = 0;
-        for (FeatureDto feature : featureRoleMap.keySet())
-        {
-            FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
-            featureRow.setFeatureName(feature.getName());
-            featureRow.setRowId(rowCounter);
-            parentRow = rowCounter;
-            rowCounter++;
-            featureRoleTreeGrid.add(featureRow);
+		for (RoleDto role : roleService.getAllRoles(false))
+		{
+			if (featureRoleMap.containsKey(role.getFeature()))
+			{
+				featureRoleMap.get(role.getFeature()).add(role);
+			}
+			else
+			{
+				List<RoleDto> list = new ArrayList<RoleDto>();
+				list.add(role);
+				featureRoleMap.put(role.getFeature(), list);
+			}
+		}
 
-            for (RoleDto role : featureRoleMap.get(feature))
-            {
-                FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
-                roleRow.setRowId(rowCounter);
-                rowCounter++;
-                roleRow.setParentRowId(parentRow);
-                roleRow.setRole(role);
-                featureRoleTreeGrid.add(roleRow);
-            }
-        }
+		for (List<RoleDto> roleList : featureRoleMap.values())
+		{
+			Collections.sort(roleList, RoleDto.RoleDtoComparator);
+		}
 
-        return featureRoleTreeGrid;
-    }
+		long parentRow = -1;
+		long rowCounter = 0;
+		for (FeatureDto feature : featureRoleMap.keySet())
+		{
+			FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
+			featureRow.setFeatureName(feature.getName());
+			featureRow.setRowId(rowCounter);
+			parentRow = rowCounter;
+			rowCounter++;
+			featureRoleTreeGrid.add(featureRow);
+
+			for (RoleDto role : featureRoleMap.get(feature))
+			{
+				FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
+				roleRow.setRowId(rowCounter);
+				rowCounter++;
+				roleRow.setParentRowId(parentRow);
+				roleRow.setRole(role);
+				featureRoleTreeGrid.add(roleRow);
+			}
+		}
+
+		return featureRoleTreeGrid;
+	}
 }

@@ -20,8 +20,13 @@ import com.ecg.webclient.feature.administration.viewmodell.FeatureDto;
 @Component
 public class FeatureMapper
 {
+	private FeatureRepository featureRepo;
+
 	@Autowired
-	FeatureRepository featureRepo;
+	public FeatureMapper(FeatureRepository featureRepo)
+	{
+		this.featureRepo = featureRepo;
+	}
 
 	/**
 	 * Wandelt ein attachtes Feature in ein detachtes um.

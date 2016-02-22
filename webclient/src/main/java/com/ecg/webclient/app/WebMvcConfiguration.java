@@ -26,10 +26,9 @@ import com.ecg.webclient.feature.administration.viewmodell.formatter.CustomDateF
 public class WebMvcConfiguration extends WebMvcConfigurerAdapter
 {
 	@Autowired
-	private CustomDateFormatter dateFormatter;
-
+	private CustomDateFormatter		dateFormatter;
 	@Autowired
-	private RemoteLoginInterceptor remoteLoginInterceptor;
+	private RemoteLoginInterceptor	remoteLoginInterceptor;
 
 	@Override
 	public void addFormatters(FormatterRegistry registry)

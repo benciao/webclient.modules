@@ -34,177 +34,183 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @RequestMapping(value = "/admin/statistic/global")
 public class StatisticsController
 {
-    @Autowired
-    private UserService  userService;
-    @Autowired
-    private AuditService auditService;
+	private UserService		userService;
+	private AuditService	auditService;
 
-    @RequestMapping(value = "/heatData", method = RequestMethod.GET)
-    public @ResponseBody List<HeatData> getHeatData()
-    {
-        List<HeatData> result = new ArrayList<HeatData>();
+	@Autowired
+	public StatisticsController(UserService userService, AuditService auditService)
+	{
+		this.userService = userService;
+		this.auditService = auditService;
+	}
 
-        List<UserDto> users = userService.getAllUsers(false);
+	@RequestMapping(value = "/heatData", method = RequestMethod.GET)
+	public @ResponseBody List<HeatData> getHeatData()
+	{
+		List<HeatData> result = new ArrayList<HeatData>();
 
-        Calendar cal = Calendar.getInstance();
-        int userPosition = 0;
-        for (UserDto user : users)
-        {
-            Map<Integer, Integer> hours = initLoginsPerHour();
+		List<UserDto> users = userService.getAllUsers(false);
 
-            for (Date date : auditService.getLoginAttemptsTime(user))
-            {
-                cal.setTime(date);
-                Integer hour = cal.get(Calendar.HOUR_OF_DAY);
-                hours.put(hour, hours.get(hour) + 1);
-            }
-            
-            List<HeatDataPoint> dataPoints = new ArrayList<HeatDataPoint>();
+		Calendar cal = Calendar.getInstance();
+		int userPosition = 0;
+		for (UserDto user : users)
+		{
+			Map<Integer, Integer> hours = initLoginsPerHour();
 
-            for (Integer hour : hours.keySet())
-            {
-                dataPoints.add(new HeatDataPoint(hour.toString() + ":00", hour, hours.get(hour)));
-            }
-            
-            result.add(new HeatData(user.getLogin(), userPosition, dataPoints));
-            userPosition++;
-        }
+			for (Date date : auditService.getLoginAttemptsTime(user))
+			{
+				cal.setTime(date);
+				Integer hour = cal.get(Calendar.HOUR_OF_DAY);
+				hours.put(hour, hours.get(hour) + 1);
+			}
 
-        return result;
-    }
+			List<HeatDataPoint> dataPoints = new ArrayList<HeatDataPoint>();
 
-    @RequestMapping(value = "/pieData", method = RequestMethod.GET)
-    public @ResponseBody List<PieDataPoint> getPieData()
-    {
-        List<PieDataPoint> result = new ArrayList<PieDataPoint>();
+			for (Integer hour : hours.keySet())
+			{
+				dataPoints.add(new HeatDataPoint(hour.toString() + ":00", hour, hours.get(hour)));
+			}
 
-        List<UserDto> users = userService.getAllUsers(false);
+			result.add(new HeatData(user.getLogin(), userPosition, dataPoints));
+			userPosition++;
+		}
 
-        for (UserDto user : users)
-        {
-            Integer countOk = auditService.countLoginAttempts(user, true);
-            Integer countFailed = auditService.countLoginAttempts(user, false);
-            result.add(new PieDataPoint(user.getLogin(), countOk, countFailed));
-        }
+		return result;
+	}
 
-        return result;
-    }
+	@RequestMapping(value = "/pieData", method = RequestMethod.GET)
+	public @ResponseBody List<PieDataPoint> getPieData()
+	{
+		List<PieDataPoint> result = new ArrayList<PieDataPoint>();
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/statistic/global". Lädt alle Statistiken.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showGlobalStatistics(Model model)
-    {
-        return getLoadingRedirectTemplate();
-    }
+		List<UserDto> users = userService.getAllUsers(false);
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/loginAttemptsGlobal";
-    }
+		for (UserDto user : users)
+		{
+			Integer countOk = auditService.countLoginAttempts(user, true);
+			Integer countFailed = auditService.countLoginAttempts(user, false);
+			result.add(new PieDataPoint(user.getLogin(), countOk, countFailed));
+		}
 
-    private Map<Integer, Integer> initLoginsPerHour()
-    {
-        Map<Integer, Integer> result = new HashMap<Integer, Integer>();
+		return result;
+	}
 
-        for (int hour = 0; hour < 24; ++hour)
-        {
-            result.put(hour, 0);
-        }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/statistic/global". Lädt alle
+	 * Statistiken.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showGlobalStatistics(Model model)
+	{
+		return getLoadingRedirectTemplate();
+	}
 
-        return result;
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/loginAttemptsGlobal";
+	}
 
-    public class HeatData
-    {
-        private String              name;
-        private int                 position;
-        private List<HeatDataPoint> hours;
+	private Map<Integer, Integer> initLoginsPerHour()
+	{
+		Map<Integer, Integer> result = new HashMap<Integer, Integer>();
 
-        public HeatData(String name, int position, List<HeatDataPoint> hours)
-        {
-            this.name = name;
-            this.position = position;
-            this.hours = hours;
-        }
+		for (int hour = 0; hour < 24; ++hour)
+		{
+			result.put(hour, 0);
+		}
 
-        public List<HeatDataPoint> getHours()
-        {
-            return hours;
-        }
+		return result;
+	}
 
-        public String getName()
-        {
-            return name;
-        }
+	public class HeatData
+	{
+		private String				name;
+		private int					position;
+		private List<HeatDataPoint>	hours;
 
-        public int getPosition()
-        {
-            return position;
-        }
+		public HeatData(String name, int position, List<HeatDataPoint> hours)
+		{
+			this.name = name;
+			this.position = position;
+			this.hours = hours;
+		}
 
-    }
+		public List<HeatDataPoint> getHours()
+		{
+			return hours;
+		}
 
-    public class HeatDataPoint
-    {
-        private String name;
-        private int    position;
-        private int    count;
+		public String getName()
+		{
+			return name;
+		}
 
-        public HeatDataPoint(String name, int position, int count)
-        {
-            this.name = name;
-            this.position = position;
-            this.count = count;
-        }
+		public int getPosition()
+		{
+			return position;
+		}
 
-        public int getCount()
-        {
-            return count;
-        }
+	}
 
-        public String getName()
-        {
-            return name;
-        }
+	public class HeatDataPoint
+	{
+		private String	name;
+		private int		position;
+		private int		count;
 
-        public int getPosition()
-        {
-            return position;
-        }
-    }
+		public HeatDataPoint(String name, int position, int count)
+		{
+			this.name = name;
+			this.position = position;
+			this.count = count;
+		}
 
-    public class PieDataPoint
-    {
-        private String name;
-        private int    countOk;
-        private int    countFailed;
+		public int getCount()
+		{
+			return count;
+		}
 
-        public PieDataPoint(String name, int countOk, int countFailed)
-        {
-            this.name = name;
-            this.countOk = countOk;
-            this.countFailed = countFailed;
-        }
+		public String getName()
+		{
+			return name;
+		}
 
-        public int getCountFailed()
-        {
-            return countFailed;
-        }
+		public int getPosition()
+		{
+			return position;
+		}
+	}
 
-        public int getCountOk()
-        {
-            return countOk;
-        }
+	public class PieDataPoint
+	{
+		private String	name;
+		private int		countOk;
+		private int		countFailed;
 
-        public String getName()
-        {
-            return name;
-        }
-    }
+		public PieDataPoint(String name, int countOk, int countFailed)
+		{
+			this.name = name;
+			this.countOk = countOk;
+			this.countFailed = countFailed;
+		}
+
+		public int getCountFailed()
+		{
+			return countFailed;
+		}
+
+		public int getCountOk()
+		{
+			return countOk;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+	}
 }

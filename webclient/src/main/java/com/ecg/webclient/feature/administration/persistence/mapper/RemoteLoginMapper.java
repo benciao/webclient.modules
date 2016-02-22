@@ -23,12 +23,18 @@ import com.ecg.webclient.feature.administration.viewmodell.RemoteLoginDto;
 @Component
 public class RemoteLoginMapper
 {
+	private RemoteLoginRepository	remoteLoginRepo;
+	private RemoteSystemRepository	remoteSystemRepo;
+	private UserRepository			userRepo;
+
 	@Autowired
-	RemoteLoginRepository	remoteLoginRepo;
-	@Autowired
-	RemoteSystemRepository	remoteSystemRepo;
-	@Autowired
-	UserRepository			userRepo;
+	public RemoteLoginMapper(RemoteLoginRepository remoteLoginRepo, RemoteSystemRepository remoteSystemRepo,
+			UserRepository userRepo)
+	{
+		this.remoteLoginRepo = remoteLoginRepo;
+		this.remoteSystemRepo = remoteSystemRepo;
+		this.userRepo = userRepo;
+	}
 
 	/**
 	 * Wandelt ein attachtes RemoteLogin in ein detachtes um.
@@ -103,7 +109,7 @@ public class RemoteLoginMapper
 		entity.setId(dto.getId());
 		entity.setEnabled(dto.isEnabled());
 		entity.setRemoteSystemLoginName(dto.getRemoteSystemLoginName());
-        entity.setRemoteSystemPassword(PasswordEncoder.encode2Way(dto.getRemoteSystemPassword()));
+		entity.setRemoteSystemPassword(PasswordEncoder.encode2Way(dto.getRemoteSystemPassword()));
 		entity.setUser(userRepo.findOne(Long.parseLong(dto.getUserId())));
 		entity.setRemoteSystem(remoteSystemRepo.findOne(Long.parseLong(dto.getRemoteSystemId())));
 

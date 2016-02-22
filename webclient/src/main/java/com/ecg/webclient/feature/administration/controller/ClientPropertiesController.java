@@ -26,7 +26,8 @@ import com.ecg.webclient.feature.administration.viewmodell.ClientPropertyDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.ClientPropertyDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Mandanteneigenschaften).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Mandanteneigenschaften).
  * 
  * @author arndtmar
  *
@@ -36,79 +37,86 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.ClientPrope
 @RequestMapping(value = "/admin/clientp")
 public class ClientPropertiesController
 {
-    static final Logger           logger = LogManager.getLogger(ClientPropertiesController.class.getName());
+	static final Logger logger = LogManager.getLogger(ClientPropertiesController.class.getName());
 
-    @Autowired
-    private AuthenticationUtil    authUtil;
-    @Autowired
-    private ClientPropertyService clientPropertyService;
-    @Autowired
-    ClientPropertyDtoValidator    propertyDtoValidator;
+	private AuthenticationUtil			authUtil;
+	private ClientPropertyService		clientPropertyService;
+	private ClientPropertyDtoValidator	propertyDtoValidator;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert Änderungen an Mandanteneigenschaften.
-     * 
-     * @return Template
-     */
-    @Transactional
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveClientProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
-    {
-        List<ClientPropertyDto> updateDtos = new ArrayList<ClientPropertyDto>();
-        List<ClientPropertyDto> deleteDtos = new ArrayList<ClientPropertyDto>();
+	@Autowired
+	public ClientPropertiesController(AuthenticationUtil authUtil, ClientPropertyService clientPropertyService,
+			ClientPropertyDtoValidator propertyDtoValidator)
+	{
+		this.authUtil = authUtil;
+		this.clientPropertyService = clientPropertyService;
+		this.propertyDtoValidator = propertyDtoValidator;
+	}
 
-        ClientDto selectedClient = authUtil.getSelectedClient();
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/clientp/save". Speichert
+	 * Änderungen an Mandanteneigenschaften.
+	 * 
+	 * @return Template
+	 */
+	@Transactional
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveClientProperties(@Valid ClientProperties clientProperties, BindingResult bindingResult)
+	{
+		List<ClientPropertyDto> updateDtos = new ArrayList<ClientPropertyDto>();
+		List<ClientPropertyDto> deleteDtos = new ArrayList<ClientPropertyDto>();
 
-        for (ClientPropertyDto dto : clientProperties.getProperties())
-        {
-            if (dto.isDelete())
-            {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                dto.setClient(selectedClient);
-                updateDtos.add(dto);
-            }
-        }
+		ClientDto selectedClient = authUtil.getSelectedClient();
 
-        clientPropertyService.deleteClientProperties(deleteDtos);
-        clientProperties.removeDeleted();
+		for (ClientPropertyDto dto : clientProperties.getProperties())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				dto.setClient(selectedClient);
+				updateDtos.add(dto);
+			}
+		}
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		clientPropertyService.deleteClientProperties(deleteDtos);
+		clientProperties.removeDeleted();
 
-        clientPropertyService.saveClientProperties(updateDtos);
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		clientPropertyService.saveClientProperties(updateDtos);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/clientp". Lädt alle zum aktuell ausgewählten Mandanten gehörige
-     * Mandanteneigenschaften.
-     * 
-     * @return Template
-     */
-    @RequestMapping(method = RequestMethod.GET)
-    public String showClientProperties(Model model)
-    {
-        ClientProperties clientProperties = new ClientProperties();
-        clientProperties.setProperties(clientPropertyService.getClientPropertiesForClientId(authUtil
-                .getSelectedClient().getId()));
-        model.addAttribute("clientProperties", clientProperties);
-        return getLoadingRedirectTemplate();
-    }
+		return "redirect:";
+	}
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/clientproperties";
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/clientp". Lädt alle zum aktuell
+	 * ausgewählten Mandanten gehörige Mandanteneigenschaften.
+	 * 
+	 * @return Template
+	 */
+	@RequestMapping(method = RequestMethod.GET)
+	public String showClientProperties(Model model)
+	{
+		ClientProperties clientProperties = new ClientProperties();
+		clientProperties.setProperties(
+				clientPropertyService.getClientPropertiesForClientId(authUtil.getSelectedClient().getId()));
+		model.addAttribute("clientProperties", clientProperties);
+		return getLoadingRedirectTemplate();
+	}
 
-    @InitBinder("clientProperties")
-    protected void initPropertyBinder(WebDataBinder binder)
-    {
-        binder.setValidator(propertyDtoValidator);
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/clientproperties";
+	}
+
+	@InitBinder("clientProperties")
+	protected void initPropertyBinder(WebDataBinder binder)
+	{
+		binder.setValidator(propertyDtoValidator);
+	}
 }

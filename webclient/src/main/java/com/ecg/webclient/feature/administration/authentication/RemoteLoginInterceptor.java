@@ -19,8 +19,8 @@ import com.ecg.webclient.feature.administration.service.UserService;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
- * Dieser Interceptor wird ausgeführt nach erfolgreichem Login um die Cookies der Fremdsysteme zu setzen. Wird
- * beim Pfad "/main" getriggert.
+ * Dieser Interceptor wird ausgeführt nach erfolgreichem Login um die Cookies
+ * der Fremdsysteme zu setzen. Wird beim Pfad "/main" getriggert.
  * 
  * @author arndtmar
  *
@@ -28,39 +28,44 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 @Component
 public class RemoteLoginInterceptor extends HandlerInterceptorAdapter
 {
-    static final Logger logger = LogManager.getLogger(RemoteLoginInterceptor.class.getName());
+	static final Logger logger = LogManager.getLogger(RemoteLoginInterceptor.class.getName());
 
-    @Autowired
-    RemoteSystemService remoteSystemService;
-    @Autowired
-    UserService         userService;
+	private RemoteSystemService	remoteSystemService;
+	private UserService			userService;
 
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
-            Exception ex) throws Exception
-    {
-        // Anmeldung an Fremdsystemen versuchen
-        try
-        {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            UserDto user = userService.getUserByLogin(auth.getName());
+	@Autowired
+	public RemoteLoginInterceptor(RemoteSystemService remoteSystemService, UserService userService)
+	{
+		this.remoteSystemService = remoteSystemService;
+		this.userService = userService;
+	}
 
-            List<Cookie> cookies = remoteSystemService.doRemoteLogin(user.getId());
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+			throws Exception
+	{
+		// Anmeldung an Fremdsystemen versuchen
+		try
+		{
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			UserDto user = userService.getUserByLogin(auth.getName());
 
-            for (Cookie remoteCookie : cookies)
-            {
-                javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(remoteCookie.getName(),
-                        remoteCookie.getValue());
-                cookie.setHttpOnly(true);
-                cookie.setPath(remoteCookie.getPath());
+			List<Cookie> cookies = remoteSystemService.doRemoteLogin(user.getId());
 
-                response.addCookie(cookie);
-            }
+			for (Cookie remoteCookie : cookies)
+			{
+				javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(remoteCookie.getName(),
+						remoteCookie.getValue());
+				cookie.setHttpOnly(true);
+				cookie.setPath(remoteCookie.getPath());
 
-        }
-        catch (Exception exc)
-        {
-            logger.error("remote login failed.", exc);
-        }
-    }
+				response.addCookie(cookie);
+			}
+
+		}
+		catch (Exception exc)
+		{
+			logger.error("remote login failed.", exc);
+		}
+	}
 }

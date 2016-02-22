@@ -42,22 +42,29 @@ public class AdministrationController
 			.getLogger(AdministrationController.class.getName());
 	static final String	PROPERTY_NAME_SETUP_USER_PASSWORD	= "sec.setup.user.pw";
 
-	@Autowired
 	private AuthenticationUtil	authUtil;
-	@Autowired
 	private RoleService			roleService;
-	@Autowired
 	private FeatureService		featureService;
-	@Autowired
 	private EnvironmentService	environmentService;
-	@Autowired
 	private Environment			env;
-	@Autowired
 	private GroupService		groupService;
-	@Autowired
 	private ClientService		clientService;
-	@Autowired
 	private UserService			userService;
+
+	@Autowired
+	public AdministrationController(AuthenticationUtil authUtil, RoleService roleService, FeatureService featureService,
+			EnvironmentService environmentService, Environment env, GroupService groupService,
+			ClientService clientService, UserService userService)
+	{
+		this.authUtil = authUtil;
+		this.roleService = roleService;
+		this.featureService = featureService;
+		this.environmentService = environmentService;
+		this.env = env;
+		this.groupService = groupService;
+		this.clientService = clientService;
+		this.userService = userService;
+	}
 
 	/**
 	 * Behandelt GET-Requests vom Typ "/admin".

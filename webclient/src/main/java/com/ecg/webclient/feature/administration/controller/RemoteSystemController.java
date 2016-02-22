@@ -41,13 +41,20 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.RemoteSyste
 @RequestMapping(value = "/admin/remotesystem")
 public class RemoteSystemController
 {
-	static final Logger			logger	= LogManager.getLogger(RemoteSystemController.class.getName());
+	static final Logger logger = LogManager.getLogger(RemoteSystemController.class.getName());
+
+	private RemoteSystemService			remoteSystemService;
+	private RemoteSystemDtoValidator	remoteSystemDtoValidator;
+	private UserService					userService;
+
 	@Autowired
-	RemoteSystemService			remoteSystemService;
-	@Autowired
-	RemoteSystemDtoValidator	remoteSystemDtoValidator;
-	@Autowired
-	UserService					userService;
+	public RemoteSystemController(RemoteSystemService remoteSystemService,
+			RemoteSystemDtoValidator remoteSystemDtoValidator, UserService userService)
+	{
+		this.remoteSystemService = remoteSystemService;
+		this.remoteSystemDtoValidator = remoteSystemDtoValidator;
+		this.userService = userService;
+	}
 
 	/**
 	 * Behandelt POST-Requests vom Typ "/admin/remotesystem/save". Speichert

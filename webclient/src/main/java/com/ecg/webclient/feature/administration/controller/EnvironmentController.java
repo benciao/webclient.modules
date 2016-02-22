@@ -23,7 +23,8 @@ import com.ecg.webclient.feature.administration.viewmodell.EnvironmentDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.EnvironmentDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Systemumgebung).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Systemumgebung).
  * 
  * @author arndtmar
  *
@@ -33,57 +34,64 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.Environment
 @RequestMapping(value = "/admin/environment")
 public class EnvironmentController
 {
-    static final Logger        logger = LogManager.getLogger(EnvironmentController.class.getName());
+	static final Logger logger = LogManager.getLogger(EnvironmentController.class.getName());
 
-    @Autowired
-    private EnvironmentService environmentService;
-    @Autowired
-    EnvironmentDtoValidator    environmentDtoValidator;
+	private EnvironmentService		environmentService;
+	private EnvironmentDtoValidator	environmentDtoValidator;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/environment/save". Speichert Änderungen an der Systemumgebung.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveEnvironment(@Valid EnvironmentDto environment, BindingResult bindingResult)
-    {
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+	@Autowired
+	public EnvironmentController(EnvironmentService environmentService, EnvironmentDtoValidator environmentDtoValidator)
+	{
+		this.environmentService = environmentService;
+		this.environmentDtoValidator = environmentDtoValidator;
+	}
 
-        environmentService.saveEnvironment(environment);
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/environment/save". Speichert
+	 * Änderungen an der Systemumgebung.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveEnvironment(@Valid EnvironmentDto environment, BindingResult bindingResult)
+	{
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		environmentService.saveEnvironment(environment);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/environment". Lädt alle Umgebungseigenschaften.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showEnvironment(Model model)
-    {
-        EnvironmentDto environment = environmentService.getEnvironment();
-        model.addAttribute("environmentDto", environment);
+		return "redirect:";
+	}
 
-        return getLoadingRedirectTemplate();
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/environment". Lädt alle
+	 * Umgebungseigenschaften.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showEnvironment(Model model)
+	{
+		EnvironmentDto environment = environmentService.getEnvironment();
+		model.addAttribute("environmentDto", environment);
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/environment";
-    }
+		return getLoadingRedirectTemplate();
+	}
 
-    @InitBinder("environmentDto")
-    protected void initEnvironmentBinder(WebDataBinder binder)
-    {
-        binder.setValidator(environmentDtoValidator);
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/environment";
+	}
+
+	@InitBinder("environmentDto")
+	protected void initEnvironmentBinder(WebDataBinder binder)
+	{
+		binder.setValidator(environmentDtoValidator);
+	}
 }
