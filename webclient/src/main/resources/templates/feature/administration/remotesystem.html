@@ -376,7 +376,8 @@
 		row.addClass('highlight').siblings().removeClass('highlight');
 	}
 
-	function onDeleteClick(event) {$( ".result" ).html( data );
+	function onDeleteClick(event) {
+		
 		var collectionIndex = $(event.target).parent().attr('id').split("-");
 
 		var row = $(event.target).parent().parent().parent();
