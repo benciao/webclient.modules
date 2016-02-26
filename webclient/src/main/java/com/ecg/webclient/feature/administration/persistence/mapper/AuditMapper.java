@@ -11,75 +11,81 @@ import com.ecg.webclient.feature.administration.persistence.repo.AuditRepository
 import com.ecg.webclient.feature.administration.viewmodell.AuditDto;
 
 /**
- * Mapped einen Audit-Eintrag einer der Persistenz bekannten Entität auf einen detachten Audit-Eintrag oder
- * umgekehrt.
+ * Mapped einen Audit-Eintrag einer der Persistenz bekannten Entität auf einen
+ * detachten Audit-Eintrag oder umgekehrt.
  * 
  * @author arndtmar
  */
 @Component
 public class AuditMapper
 {
-    @Autowired
-    UserMapper userMapper;
-    @Autowired
-    AuditRepository  auditRepo;
+	private UserMapper		userMapper;
+	private AuditRepository	auditRepo;
 
-    /**
-     * Wandelt einen attachten Audit-Eintrag in einen detachten um.
-     * 
-     * @param audit
-     *            Audit-Eintrag
-     * @return Detacheter Audit-Eintrag
-     */
-    public AuditDto mapToDto(Audit audit)
-    {
-        AuditDto dto = new AuditDto();
-        dto.setId(audit.getId());
-        dto.setOccurance(audit.getOccurance());
-        dto.setAuthenticationOk(audit.isAuthenticationOk());
-        dto.setUser(userMapper.mapToDto(audit.getUser()));
-        dto.setDelete(false);
+	@Autowired
+	public AuditMapper(UserMapper userMapper, AuditRepository auditRepo)
+	{
+		this.userMapper = userMapper;
+		this.auditRepo = auditRepo;
+	}
 
-        return dto;
-    }
+	/**
+	 * Wandelt einen attachten Audit-Eintrag in einen detachten um.
+	 * 
+	 * @param audit
+	 *            Audit-Eintrag
+	 * @return Detacheter Audit-Eintrag
+	 */
+	public AuditDto mapToDto(Audit audit)
+	{
+		AuditDto dto = new AuditDto();
+		dto.setId(audit.getId());
+		dto.setOccurance(audit.getOccurance());
+		dto.setAuthenticationOk(audit.isAuthenticationOk());
+		dto.setUser(userMapper.mapToDto(audit.getUser()));
+		dto.setDelete(false);
 
-    /**
-     * Wandelt eine Liste von attachten Audit-Einträgen in eine Liste von detachten Audit-Einträgen um.
-     * 
-     * @param audits
-     *            Liste von attachten Audit-Einträgen
-     * @return Liste von detachten Audit-Einträgen
-     */
-    public List<AuditDto> mapToDtos(List<Audit> audits)
-    {
-        List<AuditDto> result = new AutoPopulatingList<AuditDto>(AuditDto.class);
+		return dto;
+	}
 
-        audits.forEach(e -> result.add(mapToDto(e)));
+	/**
+	 * Wandelt eine Liste von attachten Audit-Einträgen in eine Liste von
+	 * detachten Audit-Einträgen um.
+	 * 
+	 * @param audits
+	 *            Liste von attachten Audit-Einträgen
+	 * @return Liste von detachten Audit-Einträgen
+	 */
+	public List<AuditDto> mapToDtos(List<Audit> audits)
+	{
+		List<AuditDto> result = new AutoPopulatingList<AuditDto>(AuditDto.class);
 
-        return result;
-    }
+		audits.forEach(e -> result.add(mapToDto(e)));
 
-    /**
-     * Wandelt einen detachten Audit-Eintrag in einen attachten um.
-     * 
-     * @param dto
-     *            Detachter Audit-Eintrag
-     * @return attachter Audit-Eintrag
-     */
-    public Audit mapToEntity(AuditDto dto)
-    {
-        Audit audit = new Audit();
-        audit.setId(dto.getId());
-        audit.setOccurance(dto.getOccurance());
-        audit.setAuthenticationOk(dto.isAuthenticationOk());
-        audit.setUser(userMapper.mapToEntity(dto.getUser()));
+		return result;
+	}
 
-        Audit persistentAudit = auditRepo.findOne(audit.getId());
-        if (persistentAudit != null)
-        {
-            return persistentAudit.bind(audit);
-        }
+	/**
+	 * Wandelt einen detachten Audit-Eintrag in einen attachten um.
+	 * 
+	 * @param dto
+	 *            Detachter Audit-Eintrag
+	 * @return attachter Audit-Eintrag
+	 */
+	public Audit mapToEntity(AuditDto dto)
+	{
+		Audit audit = new Audit();
+		audit.setId(dto.getId());
+		audit.setOccurance(dto.getOccurance());
+		audit.setAuthenticationOk(dto.isAuthenticationOk());
+		audit.setUser(userMapper.mapToEntity(dto.getUser()));
 
-        return audit;
-    }
+		Audit persistentAudit = auditRepo.findOne(audit.getId());
+		if (persistentAudit != null)
+		{
+			return persistentAudit.bind(audit);
+		}
+
+		return audit;
+	}
 }

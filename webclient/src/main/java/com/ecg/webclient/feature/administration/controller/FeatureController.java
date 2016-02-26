@@ -34,10 +34,15 @@ public class FeatureController
 {
 	static final Logger logger = LogManager.getLogger(FeatureController.class.getName());
 
-	@Autowired
 	private FeatureService		featureService;
-	@Autowired
 	private AuthenticationUtil	authUtil;
+
+	@Autowired
+	public FeatureController(FeatureService featureService, AuthenticationUtil authUtil)
+	{
+		this.featureService = featureService;
+		this.authUtil = authUtil;
+	}
 
 	/**
 	 * Behandelt POST-Requests vom Typ "/admin/feature/save". Speichert

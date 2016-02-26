@@ -37,7 +37,8 @@ import com.ecg.webclient.feature.administration.viewmodell.RoleDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Gruppen).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Gruppen).
  * 
  * @author arndtmar
  *
@@ -48,165 +49,174 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.GroupDtoVal
 @SessionAttributes("groupConfig")
 public class GroupController
 {
-    static final Logger        logger = LogManager.getLogger(GroupController.class.getName());
+	static final Logger logger = LogManager.getLogger(GroupController.class.getName());
 
-    @Autowired
-    private GroupService       groupService;
-    @Autowired
-    ClientService              clientService;
-    @Autowired
-    private RoleService        roleService;
-    @Autowired
-    private AuthenticationUtil authUtil;
-    @Autowired
-    GroupDtoValidator          groupDtoValidator;
+	private GroupService		groupService;
+	private ClientService		clientService;
+	private RoleService			roleService;
+	private AuthenticationUtil	authUtil;
+	private GroupDtoValidator	groupDtoValidator;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/usergroup/copy". Kopiert eine Benutzergruppe.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/copy", method = RequestMethod.POST)
-    public String copyGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
-    {
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+	@Autowired
+	public GroupController(GroupService groupService, ClientService clientService, RoleService roleService,
+			AuthenticationUtil authUtil, GroupDtoValidator groupDtoValidator)
+	{
+		this.groupService = groupService;
+		this.clientService = clientService;
+		this.roleService = roleService;
+		this.authUtil = authUtil;
+		this.groupDtoValidator = groupDtoValidator;
+	}
 
-        // Hack, da Client nicht direkt gesetzt werden kann
-        ClientDto targetClient = clientService.getClient(groupConfig.getCopyGroup().getClient().getId());
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/usergroup/copy". Kopiert eine
+	 * Benutzergruppe.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/copy", method = RequestMethod.POST)
+	public String copyGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
+	{
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        GroupDto copyGroup = groupConfig.getCopyGroup();
-        copyGroup.setClient(targetClient);
-        groupService.saveGroup(copyGroup);
+		// Hack, da Client nicht direkt gesetzt werden kann
+		ClientDto targetClient = clientService.getClient(groupConfig.getCopyGroup().getClient().getId());
 
-        return "redirect:";
-    }
+		GroupDto copyGroup = groupConfig.getCopyGroup();
+		copyGroup.setClient(targetClient);
+		groupService.saveGroup(copyGroup);
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert Änderungen an Benutzergruppen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
-    {
-        List<GroupDto> updateDtos = new ArrayList<GroupDto>();
-        List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
+		return "redirect:";
+	}
 
-        for (GroupDto dto : groupConfig.getGroups())
-        {
-            if (dto.isDelete())
-            {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                updateDtos.add(dto);
-            }
-        }
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/usergroup/save". Speichert
+	 * Änderungen an Benutzergruppen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveGroup(@Valid GroupConfig groupConfig, BindingResult bindingResult)
+	{
+		List<GroupDto> updateDtos = new ArrayList<GroupDto>();
+		List<GroupDto> deleteDtos = new ArrayList<GroupDto>();
 
-        groupService.deleteGroups(deleteDtos);
+		for (GroupDto dto : groupConfig.getGroups())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
 
-        groupConfig.removeDeleted();
+		groupService.deleteGroups(deleteDtos);
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		groupConfig.removeDeleted();
 
-        groupService.saveGroups(updateDtos, authUtil);
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		groupService.saveGroups(updateDtos, authUtil);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell ausgewählten Mandanten
-     * gehörige Benutzergruppen und deren zugeordnete Benutzerrollen.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showGroupConfig(Model model)
-    {
-        GroupConfig groupConfig = new GroupConfig();
-        List<GroupDto> groups = groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId());
-        Collections.sort(groups, GroupDto.GroupDtoComparator);
-        groupConfig.setGroups(groups);
-        groupConfig.setFeatureRoleTreeGrid(generateTreeGrid());
-        groupConfig.setClientId(authUtil.getSelectedClient().getId());
-        groupConfig.setCopyGroup(new GroupDto());
-        model.addAttribute("groupConfig", groupConfig);
+		return "redirect:";
+	}
 
-        return getLoadingRedirectTemplate();
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/usergroup". Lädt alle zum aktuell
+	 * ausgewählten Mandanten gehörige Benutzergruppen und deren zugeordnete
+	 * Benutzerrollen.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showGroupConfig(Model model)
+	{
+		GroupConfig groupConfig = new GroupConfig();
+		List<GroupDto> groups = groupService.getAllGroupsForClient(authUtil.getSelectedClient().getId());
+		Collections.sort(groups, GroupDto.GroupDtoComparator);
+		groupConfig.setGroups(groups);
+		groupConfig.setFeatureRoleTreeGrid(generateTreeGrid());
+		groupConfig.setClientId(authUtil.getSelectedClient().getId());
+		groupConfig.setCopyGroup(new GroupDto());
+		model.addAttribute("groupConfig", groupConfig);
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/usergroup";
-    }
+		return getLoadingRedirectTemplate();
+	}
 
-    @InitBinder("groupConfig")
-    protected void initGroupBinder(WebDataBinder binder)
-    {
-        binder.setValidator(groupDtoValidator);
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/usergroup";
+	}
 
-    private List<FeatureRoleTreeGridDto> generateTreeGrid()
-    {
-        List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
+	@InitBinder("groupConfig")
+	protected void initGroupBinder(WebDataBinder binder)
+	{
+		binder.setValidator(groupDtoValidator);
+	}
 
-        TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
-                FeatureDto.FeatureDtoComparator);
+	private List<FeatureRoleTreeGridDto> generateTreeGrid()
+	{
+		List<FeatureRoleTreeGridDto> featureRoleTreeGrid = new ArrayList<FeatureRoleTreeGridDto>();
 
-        for (RoleDto role : roleService.getAllRoles(false))
-        {
-            if (featureRoleMap.containsKey(role.getFeature()))
-            {
-                featureRoleMap.get(role.getFeature()).add(role);
-            }
-            else
-            {
-                List<RoleDto> list = new ArrayList<RoleDto>();
-                list.add(role);
-                featureRoleMap.put(role.getFeature(), list);
-            }
-        }
+		TreeMap<FeatureDto, List<RoleDto>> featureRoleMap = new TreeMap<FeatureDto, List<RoleDto>>(
+				FeatureDto.FeatureDtoComparator);
 
-        for (List<RoleDto> roleList : featureRoleMap.values())
-        {
-            Collections.sort(roleList, RoleDto.RoleDtoComparator);
-        }
+		for (RoleDto role : roleService.getAllRoles(false))
+		{
+			if (featureRoleMap.containsKey(role.getFeature()))
+			{
+				featureRoleMap.get(role.getFeature()).add(role);
+			}
+			else
+			{
+				List<RoleDto> list = new ArrayList<RoleDto>();
+				list.add(role);
+				featureRoleMap.put(role.getFeature(), list);
+			}
+		}
 
-        long parentRow = -1;
-        long rowCounter = 0;
-        for (FeatureDto feature : featureRoleMap.keySet())
-        {
-            FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
-            featureRow.setFeatureName(feature.getName());
-            featureRow.setRowId(rowCounter);
-            parentRow = rowCounter;
-            rowCounter++;
-            featureRoleTreeGrid.add(featureRow);
+		for (List<RoleDto> roleList : featureRoleMap.values())
+		{
+			Collections.sort(roleList, RoleDto.RoleDtoComparator);
+		}
 
-            for (RoleDto role : featureRoleMap.get(feature))
-            {
-                FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
-                roleRow.setRowId(rowCounter);
-                rowCounter++;
-                roleRow.setParentRowId(parentRow);
-                roleRow.setRole(role);
-                featureRoleTreeGrid.add(roleRow);
-            }
-        }
+		long parentRow = -1;
+		long rowCounter = 0;
+		for (FeatureDto feature : featureRoleMap.keySet())
+		{
+			FeatureRoleTreeGridDto featureRow = new FeatureRoleTreeGridDto();
+			featureRow.setFeatureName(feature.getName());
+			featureRow.setRowId(rowCounter);
+			parentRow = rowCounter;
+			rowCounter++;
+			featureRoleTreeGrid.add(featureRow);
 
-        return featureRoleTreeGrid;
-    }
+			for (RoleDto role : featureRoleMap.get(feature))
+			{
+				FeatureRoleTreeGridDto roleRow = new FeatureRoleTreeGridDto();
+				roleRow.setRowId(rowCounter);
+				rowCounter++;
+				roleRow.setParentRowId(parentRow);
+				roleRow.setRole(role);
+				featureRoleTreeGrid.add(roleRow);
+			}
+		}
+
+		return featureRoleTreeGrid;
+	}
 }

@@ -21,8 +21,13 @@ import com.ecg.webclient.feature.administration.viewmodell.LdapConfigDto;
 @Component
 public class LdapConfigMapper
 {
+	private LdapConfigRepository ldapConfigRepo;
+
 	@Autowired
-	LdapConfigRepository ldapConfigRepo;
+	public LdapConfigMapper(LdapConfigRepository ldapConfigRepo)
+	{
+		this.ldapConfigRepo = ldapConfigRepo;
+	}
 
 	/**
 	 * Wandelt eine attachte LDAP-Konfiguration in eine detachte um.

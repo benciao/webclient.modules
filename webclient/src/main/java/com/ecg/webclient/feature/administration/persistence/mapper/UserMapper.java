@@ -11,129 +11,132 @@ import com.ecg.webclient.feature.administration.persistence.modell.Group;
 import com.ecg.webclient.feature.administration.persistence.modell.User;
 import com.ecg.webclient.feature.administration.persistence.repo.ClientRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.GroupRepository;
-import com.ecg.webclient.feature.administration.persistence.repo.RemoteSystemRepository;
 import com.ecg.webclient.feature.administration.persistence.repo.UserRepository;
 import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 
 /**
- * Mapped die Eigenschaften einer der Persistenz bekannten Entität auf einen detachten Benutzer oder
- * umgekehrt.
+ * Mapped die Eigenschaften einer der Persistenz bekannten Entität auf einen
+ * detachten Benutzer oder umgekehrt.
  * 
  * @author arndtmar
  */
 @Component
 public class UserMapper
 {
-    @Autowired
-    ClientRepository       clientRepo;
-    @Autowired
-    GroupRepository        groupRepo;
-    @Autowired
-    UserRepository         userRepo;
-    @Autowired
-    RemoteSystemRepository remoteSystemRepo;
+	private ClientRepository	clientRepo;
+	private GroupRepository		groupRepo;
+	private UserRepository		userRepo;
 
-    /**
-     * Wandelt einen attachten Benutzer in einen detachten um.
-     * 
-     * @param user
-     *            attachten Benutzer
-     * @return Detacheter Benutzer
-     */
-    public UserDto mapToDto(User user)
-    {
-        UserDto dto = new UserDto();
-        dto.setLogin(user.getLogin());
-        dto.setInternal(user.isInternal());
-        dto.setLastname(user.getLastname());
-        dto.setFirstname(user.getFirstname());
-        dto.setEnabled(user.isEnabled());
-        dto.setDelete(false);
-        dto.setId(user.getId());
-        dto.setEmail(user.getEmail());
-        dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
-        dto.setPasswortChangedTimeStamp(user.getPasswordChangedTimeStamp());
-        dto.setLoginAttempts(user.getLoginAttempts());
-        dto.setAccountLocked(user.isAccountLocked());
+	@Autowired
+	public UserMapper(ClientRepository clientRepo, GroupRepository groupRepo, UserRepository userRepo)
+	{
+		this.clientRepo = clientRepo;
+		this.groupRepo = groupRepo;
+		this.userRepo = userRepo;
+	}
 
-        if (user.getDefaultClient() != null)
-        {
-            dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
-        }
+	/**
+	 * Wandelt einen attachten Benutzer in einen detachten um.
+	 * 
+	 * @param user
+	 *            attachten Benutzer
+	 * @return Detacheter Benutzer
+	 */
+	public UserDto mapToDto(User user)
+	{
+		UserDto dto = new UserDto();
+		dto.setLogin(user.getLogin());
+		dto.setInternal(user.isInternal());
+		dto.setLastname(user.getLastname());
+		dto.setFirstname(user.getFirstname());
+		dto.setEnabled(user.isEnabled());
+		dto.setDelete(false);
+		dto.setId(user.getId());
+		dto.setEmail(user.getEmail());
+		dto.setChangePasswordOnNextLogin(user.isChangePasswordOnNextLogin());
+		dto.setPasswortChangedTimeStamp(user.getPasswordChangedTimeStamp());
+		dto.setLoginAttempts(user.getLoginAttempts());
+		dto.setAccountLocked(user.isAccountLocked());
 
-        if (user.getGroups() != null)
-        {
-            String groups = "";
-            for (Group group : user.getGroups())
-            {
-                if (groups.length() == 0)
-                {
-                    groups = Long.toString(group.getId());
-                }
-                else
-                {
-                    groups = groups + "," + group.getId();
-                }
-            }
-            dto.setGroupIds(groups);
-        }
+		if (user.getDefaultClient() != null)
+		{
+			dto.setDefaultClient(Long.toString(user.getDefaultClient().getId()));
+		}
 
-        return dto;
-    }
+		if (user.getGroups() != null)
+		{
+			String groups = "";
+			for (Group group : user.getGroups())
+			{
+				if (groups.length() == 0)
+				{
+					groups = Long.toString(group.getId());
+				}
+				else
+				{
+					groups = groups + "," + group.getId();
+				}
+			}
+			dto.setGroupIds(groups);
+		}
 
-    /**
-     * Wandelt eine Liste von attachten Benutzern in eine Liste von detachten Benutzern um.
-     * 
-     * @param users
-     *            Liste von attachten Benutzern
-     * @return Liste von detachten Benutzern
-     */
-    public List<UserDto> mapToDtos(List<User> users)
-    {
-        List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
+		return dto;
+	}
 
-        users.forEach(e -> result.add(mapToDto(e)));
+	/**
+	 * Wandelt eine Liste von attachten Benutzern in eine Liste von detachten
+	 * Benutzern um.
+	 * 
+	 * @param users
+	 *            Liste von attachten Benutzern
+	 * @return Liste von detachten Benutzern
+	 */
+	public List<UserDto> mapToDtos(List<User> users)
+	{
+		List<UserDto> result = new AutoPopulatingList<UserDto>(UserDto.class);
 
-        return result;
-    }
+		users.forEach(e -> result.add(mapToDto(e)));
 
-    /**
-     * Wandelt einen detachten Benutzer in einen attachten um.
-     * 
-     * @param dto
-     *            Detachter Benutzer
-     * @return attachter Benutzer
-     */
-    public User mapToEntity(UserDto dto)
-    {
-        User entity = new User();
-        entity.setId(dto.getId());
-        entity.setLogin(dto.getLogin());
-        entity.setInternal(dto.isInternal());
-        entity.setLastname(dto.getLastname());
-        entity.setFirstname(dto.getFirstname());
-        entity.setEnabled(dto.isEnabled());
-        entity.setAccountLocked(dto.isAccountLocked());
-        entity.setEmail(dto.getEmail());
-        entity.setLoginAttempts(dto.getLoginAttempts());
-        entity.setPassword(dto.getPassword());
-        entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
-        if (dto.getDefaultClient() != null && !dto.getDefaultClient().isEmpty())
-        {
-            entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
-        }
+		return result;
+	}
 
-        List<Group> groups = new ArrayList<Group>();
-        groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
+	/**
+	 * Wandelt einen detachten Benutzer in einen attachten um.
+	 * 
+	 * @param dto
+	 *            Detachter Benutzer
+	 * @return attachter Benutzer
+	 */
+	public User mapToEntity(UserDto dto)
+	{
+		User entity = new User();
+		entity.setId(dto.getId());
+		entity.setLogin(dto.getLogin());
+		entity.setInternal(dto.isInternal());
+		entity.setLastname(dto.getLastname());
+		entity.setFirstname(dto.getFirstname());
+		entity.setEnabled(dto.isEnabled());
+		entity.setAccountLocked(dto.isAccountLocked());
+		entity.setEmail(dto.getEmail());
+		entity.setLoginAttempts(dto.getLoginAttempts());
+		entity.setPassword(dto.getPassword());
+		entity.setChangePasswordOnNextLogin(dto.isChangePasswordOnNextLogin());
+		if (dto.getDefaultClient() != null && !dto.getDefaultClient().isEmpty())
+		{
+			entity.setDefaultClient(clientRepo.findOne(Long.parseLong(dto.getDefaultClient())));
+		}
 
-        entity.setGroups(groups);
+		List<Group> groups = new ArrayList<Group>();
+		groupRepo.findAll(dto.getGroupIdObjects()).forEach(e -> groups.add(e));
 
-        User persistentUser = userRepo.findOne(entity.getId());
-        if (persistentUser != null)
-        {
-            return persistentUser.bind(entity);
-        }
+		entity.setGroups(groups);
 
-        return entity;
-    }
+		User persistentUser = userRepo.findOne(entity.getId());
+		if (persistentUser != null)
+		{
+			return persistentUser.bind(entity);
+		}
+
+		return entity;
+	}
 }

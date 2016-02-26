@@ -35,7 +35,8 @@ import com.ecg.webclient.feature.administration.viewmodell.UserDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Benutzer).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Benutzer).
  * 
  * @author arndtmar
  *
@@ -45,157 +46,165 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.UserDtoVali
 @RequestMapping(value = "/admin/user")
 public class UserController
 {
-    static final Logger        logger = LogManager.getLogger(UserController.class.getName());
+	static final Logger logger = LogManager.getLogger(UserController.class.getName());
 
-    @Autowired
-    private UserService        userService;
-    @Autowired
-    private ClientService      clientService;
-    @Autowired
-    private GroupService       groupService;
-    @Autowired
-    private AuthenticationUtil authUtil;
-    @Autowired
-    UserDtoValidator           userDtoValidator;
+	private UserService			userService;
+	private ClientService		clientService;
+	private GroupService		groupService;
+	private AuthenticationUtil	authUtil;
+	private UserDtoValidator	userDtoValidator;
 
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/loginas/{userId}", method = RequestMethod.GET)
-    public String loginAsUser(Model model, @PathVariable("userId") String userId)
-    {
-        authUtil.loginAsUser(Long.parseLong(userId));
+	@Autowired
+	public UserController(UserService userService, ClientService clientService, GroupService groupService,
+			AuthenticationUtil authUtil, UserDtoValidator userDtoValidator)
+	{
+		this.userService = userService;
+		this.clientService = clientService;
+		this.groupService = groupService;
+		this.authUtil = authUtil;
+		this.userDtoValidator = userDtoValidator;
+	}
 
-        return "/main";
-    }
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/loginas/{userId}", method = RequestMethod.GET)
+	public String loginAsUser(Model model, @PathVariable("userId") String userId)
+	{
+		authUtil.loginAsUser(Long.parseLong(userId));
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/user/save". Speichert Änderungen an Benutzern.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveUser(@Valid UserConfig userConfig, BindingResult bindingResult)
-    {
-        List<UserDto> updateDtos = new ArrayList<UserDto>();
-        List<UserDto> deleteDtos = new ArrayList<UserDto>();
+		return "/main";
+	}
 
-        for (UserDto dto : userConfig.getUsers())
-        {
-            if (dto.isDelete())
-            {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                updateDtos.add(dto);
-            }
-        }
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/user/save". Speichert Änderungen
+	 * an Benutzern.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveUser(@Valid UserConfig userConfig, BindingResult bindingResult)
+	{
+		List<UserDto> updateDtos = new ArrayList<UserDto>();
+		List<UserDto> deleteDtos = new ArrayList<UserDto>();
 
-        userService.deleteUsers(deleteDtos);
+		for (UserDto dto : userConfig.getUsers())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
 
-        userConfig.removeDeleted();
+		userService.deleteUsers(deleteDtos);
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		userConfig.removeDeleted();
 
-        userService.saveUsers(updateDtos);
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		userService.saveUsers(updateDtos);
 
-    /**
-     * Behandelt einen Ajax Request zum Anzeigen von ausschließlich Mandanten, welchen die zugeordneten
-     * Gruppen angehören.
-     * 
-     * @return
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
-    public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
-            @PathVariable("userId") String userId)
-    {
-        List<Long> realGroupIds = getGroupIds(groupIds);
-        List<ClientDto> clients = clientService.getAssignedClientsForGroups(realGroupIds);
-        UserDto user = userService.getUserById(Long.parseLong(userId));
+		return "redirect:";
+	}
 
-        model.addAttribute("availableClients", clients);
+	/**
+	 * Behandelt einen Ajax Request zum Anzeigen von ausschließlich Mandanten,
+	 * welchen die zugeordneten Gruppen angehören.
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/availableClients/{groupIds}/{userId}", method = RequestMethod.GET)
+	public String showAvailableClients(Model model, @PathVariable("groupIds") String groupIds,
+			@PathVariable("userId") String userId)
+	{
+		List<Long> realGroupIds = getGroupIds(groupIds);
+		List<ClientDto> clients = clientService.getAssignedClientsForGroups(realGroupIds);
+		UserDto user = userService.getUserById(Long.parseLong(userId));
 
-        if (user != null)
-        {
-            model.addAttribute("defaultClient", user.getDefaultClient());
-        }
-        else
-        {
-            model.addAttribute("defaultClient", "");
-        }
+		model.addAttribute("availableClients", clients);
 
-        return getLoadingRedirectTemplate() + " :: availableClients";
-    }
+		if (user != null)
+		{
+			model.addAttribute("defaultClient", user.getDefaultClient());
+		}
+		else
+		{
+			model.addAttribute("defaultClient", "");
+		}
 
-    /**
-     * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten gehörende Gruppen.
-     * 
-     * @return
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/clientgroups/{clientId}", method = RequestMethod.GET)
-    public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
-    {
-        List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
+		return getLoadingRedirectTemplate() + " :: availableClients";
+	}
 
-        model.addAttribute("groups", groups);
+	/**
+	 * Behandelt einen Ajax Request zum Anzeigen von zu einem Mandanten
+	 * gehörende Gruppen.
+	 * 
+	 * @return
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/clientgroups/{clientId}", method = RequestMethod.GET)
+	public String showClientGroups(Model model, @PathVariable("clientId") String clientId)
+	{
+		List<GroupDto> groups = groupService.getAllGroupsForClient(Long.parseLong(clientId));
 
-        return "feature/administration/user :: clientGroups";
-    }
+		model.addAttribute("groups", groups);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/user". Lädt alle Benutzer.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showUserConfig(Model model)
-    {
-        UserConfig userConfig = new UserConfig();
-        List<UserDto> users = userService.getAllUsers(false);
-        Collections.sort(users, UserDto.UserDtoComparator);
-        userConfig.setUsers(users);
-        model.addAttribute("userConfig", userConfig);
+		return "feature/administration/user :: clientGroups";
+	}
 
-        return getLoadingRedirectTemplate();
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/user". Lädt alle Benutzer.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showUserConfig(Model model)
+	{
+		UserConfig userConfig = new UserConfig();
+		List<UserDto> users = userService.getAllUsers(false);
+		Collections.sort(users, UserDto.UserDtoComparator);
+		userConfig.setUsers(users);
+		model.addAttribute("userConfig", userConfig);
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/user";
-    }
+		return getLoadingRedirectTemplate();
+	}
 
-    @InitBinder("userConfig")
-    protected void initUserBinder(WebDataBinder binder)
-    {
-        binder.setValidator(userDtoValidator);
-    }
-    
-    private static List<Long> getGroupIds(String groupIds)
-    {
-        List<Long> result = new ArrayList<Long>();
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/user";
+	}
 
-        List<String> ids = Arrays.asList(groupIds.split(","));
+	@InitBinder("userConfig")
+	protected void initUserBinder(WebDataBinder binder)
+	{
+		binder.setValidator(userDtoValidator);
+	}
 
-        for (String id : ids)
-        {
-            result.add(Long.parseLong(id));
-        }
+	private static List<Long> getGroupIds(String groupIds)
+	{
+		List<Long> result = new ArrayList<Long>();
 
-        return result.size() != 0 ? result : null;
-    }
+		List<String> ids = Arrays.asList(groupIds.split(","));
+
+		for (String id : ids)
+		{
+			result.add(Long.parseLong(id));
+		}
+
+		return result.size() != 0 ? result : null;
+	}
 
 }

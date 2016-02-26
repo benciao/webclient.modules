@@ -28,7 +28,8 @@ import com.ecg.webclient.feature.administration.viewmodell.ClientDto;
 import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoValidator;
 
 /**
- * Controller zur Bearbeitung von Requests aus Administrationsdialogen (Mandant).
+ * Controller zur Bearbeitung von Requests aus Administrationsdialogen
+ * (Mandant).
  * 
  * @author arndtmar
  *
@@ -38,92 +39,99 @@ import com.ecg.webclient.feature.administration.viewmodell.validator.ClientDtoVa
 @RequestMapping(value = "/admin/client")
 public class ClientController
 {
-    static final Logger        logger = LogManager.getLogger(ClientController.class.getName());
+	static final Logger logger = LogManager.getLogger(ClientController.class.getName());
 
-    @Autowired
-    private ClientService      clientService;
-    @Autowired
-    private AuthenticationUtil authUtil;
-    @Autowired
-    ClientDtoValidator         clientDtoValidator;
+	private ClientService		clientService;
+	private AuthenticationUtil	authUtil;
+	private ClientDtoValidator	clientDtoValidator;
 
-    /**
-     * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert Änderungen an Mandanten.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
-    {
-        List<ClientDto> updateDtos = new ArrayList<ClientDto>();
-        List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
+	@Autowired
+	public ClientController(ClientService clientService, AuthenticationUtil authUtil,
+			ClientDtoValidator clientDtoValidator)
+	{
+		this.clientService = clientService;
+		this.authUtil = authUtil;
+		this.clientDtoValidator = clientDtoValidator;
+	}
 
-        for (ClientDto dto : clientConfig.getClients())
-        {
-            if (dto.isDelete())
-            {
-                deleteDtos.add(dto);
-            }
-            else
-            {
-                updateDtos.add(dto);
-            }
-        }
+	/**
+	 * Behandelt POST-Requests vom Typ "/admin/client/save". Speichert
+	 * Änderungen an Mandanten.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public String saveClient(@Valid ClientConfig clientConfig, BindingResult bindingResult)
+	{
+		List<ClientDto> updateDtos = new ArrayList<ClientDto>();
+		List<ClientDto> deleteDtos = new ArrayList<ClientDto>();
 
-        clientService.deleteClients(deleteDtos);
-        updateSelectedClient(deleteDtos);
+		for (ClientDto dto : clientConfig.getClients())
+		{
+			if (dto.isDelete())
+			{
+				deleteDtos.add(dto);
+			}
+			else
+			{
+				updateDtos.add(dto);
+			}
+		}
 
-        clientConfig.removeDeleted();
+		clientService.deleteClients(deleteDtos);
+		updateSelectedClient(deleteDtos);
 
-        if (bindingResult.hasErrors())
-        {
-            return getLoadingRedirectTemplate();
-        }
+		clientConfig.removeDeleted();
 
-        clientService.saveClients(updateDtos);
-        updateSelectedClient(updateDtos);
+		if (bindingResult.hasErrors())
+		{
+			return getLoadingRedirectTemplate();
+		}
 
-        return "redirect:";
-    }
+		clientService.saveClients(updateDtos);
+		updateSelectedClient(updateDtos);
 
-    /**
-     * Behandelt GET-Requests vom Typ "/admin/client". Lädt alle Mandanten.
-     * 
-     * @return Template
-     */
-    @PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY
-            + "') OR hasRole('" + AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
-    @RequestMapping(method = RequestMethod.GET)
-    public String showClientConfig(Model model)
-    {
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.setClients(clientService.getAllClients(false));
-        model.addAttribute("clientConfig", clientConfig);
-        return getLoadingRedirectTemplate();
-    }
+		return "redirect:";
+	}
 
-    protected String getLoadingRedirectTemplate()
-    {
-        return "feature/administration/clientconfig";
-    }
+	/**
+	 * Behandelt GET-Requests vom Typ "/admin/client". Lädt alle Mandanten.
+	 * 
+	 * @return Template
+	 */
+	@PreAuthorize("hasRole('" + AdministrationFeature.KEY + "_" + SecurityAdminAccessRole.KEY + "') OR hasRole('"
+			+ AdministrationFeature.KEY + "_" + SetupSystemAccessRole.KEY + "')")
+	@RequestMapping(method = RequestMethod.GET)
+	public String showClientConfig(Model model)
+	{
+		ClientConfig clientConfig = new ClientConfig();
+		clientConfig.setClients(clientService.getAllClients(false));
+		model.addAttribute("clientConfig", clientConfig);
+		return getLoadingRedirectTemplate();
+	}
 
-    @InitBinder("clientConfig")
-    protected void initClientBinder(WebDataBinder binder)
-    {
-        binder.setValidator(clientDtoValidator);
-    }
+	protected String getLoadingRedirectTemplate()
+	{
+		return "feature/administration/clientconfig";
+	}
 
-    private void updateSelectedClient(List<ClientDto> clientDtos)
-    {
-        for (ClientDto clientDto : clientDtos)
-        {
-            if (authUtil.getSelectedClient().getId() == clientDto.getId())
-            {
-                authUtil.setSelectedClientWithNewAuthority(clientDto);
-                break;
-            }
-        }
-    }
+	@InitBinder("clientConfig")
+	protected void initClientBinder(WebDataBinder binder)
+	{
+		binder.setValidator(clientDtoValidator);
+	}
+
+	private void updateSelectedClient(List<ClientDto> clientDtos)
+	{
+		for (ClientDto clientDto : clientDtos)
+		{
+			if (authUtil.getSelectedClient().getId() == clientDto.getId())
+			{
+				authUtil.setSelectedClientWithNewAuthority(clientDto);
+				break;
+			}
+		}
+	}
 }
